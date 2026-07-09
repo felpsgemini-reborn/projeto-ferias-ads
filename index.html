@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#7f1d1d">
     <title>Projeto ADS - Quiz</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Desabilita o highlight azul padrão do navegador mobile ao clicar */
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -57,5 +60,18 @@
         </div>
     </main>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Falha ao registrar o ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
