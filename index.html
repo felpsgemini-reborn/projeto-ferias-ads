@@ -8,39 +8,10 @@
     
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
     
     <style>
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Efeito Cortina */
-        .curtain-panel {
-            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 0%;
-        }
-        .curtain-closed .curtain-panel {
-            width: 50%;
-        }
-
-        /* Animações do Toast */
-        .toast-enter {
-            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        .toast-leave {
-            animation: fadeOutRight 0.5s forwards;
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
+        * { -webkit-tap-highlight-color: transparent; }
 
         /* Título com brilho */
         .supernatural-title {
@@ -49,20 +20,69 @@
             text-shadow: 0 0 15px rgba(185, 28, 28, 0.6), 0 0 5px rgba(185, 28, 28, 0.8);
         }
 
-        /* Animação suave para o símbolo de fundo */
-        .symbol-fade-in {
-            animation: fadeInSymbol 1s ease-in-out forwards;
-        }
+        /* Símbolos de Fundo */
+        .symbol-fade-in { animation: fadeInSymbol 1s ease-in-out forwards; }
         @keyframes fadeInSymbol {
             from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 0.15; transform: scale(1); }
+            to { opacity: 0.12; transform: scale(1); }
         }
+
+        /* === ANIMAÇÕES DO TEATRO === */
+        /* Dobras da cortina de veludo vermelho */
+        .curtain-panel {
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+            background: repeating-linear-gradient(90deg, #7f1d1d 0%, #450a0a 5%, #7f1d1d 10%);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .curtain-closed .curtain-panel { width: 50%; }
+
+        /* Luz dos Holofotes */
+        .spotlight {
+            width: 150vw;
+            height: 150vh;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 60%);
+            position: absolute;
+            top: -20vh;
+            transform-origin: top center;
+            mix-blend-mode: overlay;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .spotlights-active .spotlight { opacity: 1; }
+        
+        .spotlight-left {
+            left: -75vw;
+            animation: sweep-left 2.5s infinite alternate ease-in-out;
+        }
+        .spotlight-right {
+            right: -75vw;
+            animation: sweep-right 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes sweep-left {
+            0% { transform: rotate(15deg); }
+            100% { transform: rotate(-35deg); }
+        }
+        @keyframes sweep-right {
+            0% { transform: rotate(-15deg); }
+            100% { transform: rotate(35deg); }
+        }
+
+        /* Toasts */
+        .toast-enter { animation: slideInRight 0.4s forwards; }
+        .toast-leave { animation: fadeOutRight 0.5s forwards; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-red-900 selection:text-white overflow-x-hidden">
 
+    <audio id="bg-music" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="quiz-container" class="flex flex-col min-h-screen w-full transition-opacity duration-1000 relative">
-        
         <header class="w-full p-4 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md fixed top-0 z-20 flex flex-col items-center justify-center">
             <span class="text-[9px] text-zinc-600 uppercase tracking-[0.2em] font-bold">FATEC - Análise e Desenvolvimento de Sistemas</span>
             <h1 class="text-sm font-semibold text-zinc-400 mt-1">Trabalho de Férias <span class="text-red-800">|</span> Frontend</h1>
@@ -70,7 +90,6 @@
 
         <main class="flex-1 w-full max-w-md mx-auto mt-20 p-5 flex flex-col mb-4 z-10">
             <div class="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-2xl p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] relative overflow-hidden flex-1 flex flex-col">
-                
                 <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-800 to-transparent"></div>
 
                 <div class="text-center mb-8 mt-2">
@@ -83,8 +102,7 @@
                     Carregando pergunta...
                 </h2>
 
-                <div id="symbol-container" class="flex-1 flex items-center justify-center py-4 text-red-700 pointer-events-none">
-                    </div>
+                <div id="symbol-container" class="flex-1 flex items-center justify-center py-4 text-red-700 pointer-events-none"></div>
 
                 <div id="options-container" class="flex flex-col gap-3 mt-4"></div>
             </div>
@@ -98,130 +116,60 @@
     </div>
 
     <div id="revelation-container" class="hidden min-h-screen w-full bg-rose-50 flex-col items-center justify-center p-6 transition-opacity duration-1000 fixed inset-0 z-40 overflow-y-auto">
-        <div class="max-w-md w-full bg-white rounded-3xl shadow-[0_20px_50px_rgba(225,_29,_72,_0.1)] p-8 text-center">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-[0_20px_50px_rgba(225,_29,_72,_0.1)] p-8 text-center border-t-4 border-rose-400">
             <h1 class="text-3xl font-serif text-gray-800 mb-6">Surpresa...</h1>
             <p class="text-base text-gray-600 leading-relaxed mb-6">
                 A verdade é que esse site não é um trabalho de férias. Foi só uma desculpa que eu inventei para criar algo especial para você.
             </p>
-            <p class="text-base text-gray-600 leading-relaxed">
-                (O texto real entrará aqui na próxima etapa!)
-            </p>
         </div>
     </div>
 
-    <div id="curtain-wrapper" class="fixed inset-0 z-50 pointer-events-none flex">
-        <div id="curtain-left" class="curtain-panel h-full bg-zinc-950 border-r border-red-900/40"></div>
-        <div id="curtain-right" class="curtain-panel h-full bg-zinc-950 border-l border-red-900/40 ml-auto"></div>
+    <div id="curtain-wrapper" class="fixed inset-0 z-50 pointer-events-none flex overflow-hidden">
+        <div id="curtain-left" class="curtain-panel h-full border-r-4 border-red-950/80"></div>
+        <div id="curtain-right" class="curtain-panel h-full border-l-4 border-red-950/80 ml-auto"></div>
+        
+        <div id="spotlights-container" class="absolute inset-0 z-10 flex justify-center pointer-events-none">
+            <div class="spotlight spotlight-left"></div>
+            <div class="spotlight spotlight-right"></div>
+        </div>
     </div>
 
     <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-3 max-w-[90vw]"></div>
 
     <script>
-        // BANCO DE PERGUNTAS (1 a 15, Uma por Temporada)
-        // O "symbol" define a marca d'água no fundo (pentagram, eye, wings, mark)
         const questions = [
-            { // T1
-                question: "Qual lenda urbana foi o primeiro espírito enfrentado pelos irmãos Winchester no episódio piloto?",
-                options: ["O Homem Gancho", "Bloody Mary", "A Mulher de Branco", "Wendigo"],
-                correctAnswer: 2,
-                symbol: "pentagram"
-            },
-            { // T2
-                question: "Qual era o principal objetivo do Demônio dos Olhos Amarelos (Azazel) ao reunir as 'Crianças Especiais'?",
-                options: ["Matar John Winchester", "Abrir o Portão do Inferno", "Encontrar o Colt", "Destruir os Homens das Letras"],
-                correctAnswer: 1,
-                symbol: "eye"
-            },
-            { // T3
-                question: "No icônico episódio 'Mystery Spot', qual música toca no rádio toda manhã quando Sam acorda?",
-                options: ["Carry On Wayward Son", "Heat of the Moment", "Back in Black", "Eye of the Tiger"],
-                correctAnswer: 1,
-                symbol: "pentagram"
-            },
-            { // T4
-                question: "Quais foram as primeiras palavras exatas de Castiel ao conhecer Dean Winchester?",
-                options: ["Eu sou um anjo do Senhor.", "Você foi salvo, Dean.", "Eu sou aquele que te segurou firme e te tirou da perdição.", "Deus tem trabalho para nós."],
-                correctAnswer: 2,
-                symbol: "wings"
-            },
-            { // T5
-                question: "No épico final 'Swan Song', o que ajuda Sam a retomar o controle de seu corpo contra Lúcifer?",
-                options: ["O anel da Morte", "O Impala", "O colar do Dean", "Uma oração de Castiel"],
-                correctAnswer: 1,
-                symbol: "wings"
-            },
-            { // T6
-                question: "Quem é libertada do Purgatório e se auto-intitula a 'Mãe de Todos os Monstros'?",
-                options: ["Lilith", "Abaddon", "Eve", "Ruby"],
-                correctAnswer: 2,
-                symbol: "eye"
-            },
-            { // T7
-                question: "Qual produto de limpeza caseiro se revelou a principal arma e fraqueza dos Leviatãs?",
-                options: ["Água Sanitária", "Sal Grosso", "Bórax", "Amoníaco"],
-                correctAnswer: 2,
-                symbol: "eye"
-            },
-            { // T8
-                question: "Em qual cidade fica localizado o bunker secreto dos Homens das Letras?",
-                options: ["Lawrence, Kansas", "Lebanon, Kansas", "Sioux Falls, Dakota do Sul", "Pontiac, Illinois"],
-                correctAnswer: 1,
-                symbol: "pentagram"
-            },
-            { // T9
-                question: "Para empunhar a Primeira Espada e derrotar Abaddon, o que Dean precisou receber?",
-                options: ["A Graça de um Arcanjo", "A Marca de Caim", "Sangue de Demônio", "A Bênção de Chuck"],
-                correctAnswer: 1,
-                symbol: "mark"
-            },
-            { // T10
-                question: "O que acontece com Dean logo após ser morto por Metatron, devido à Marca de Caim?",
-                options: ["Vai para o Purgatório", "Se torna um Cavaleiro do Inferno", "Ressuscita como Anjo", "Se torna um Demônio"],
-                correctAnswer: 3,
-                symbol: "mark"
-            },
-            { // T11
-                question: "Qual é a verdadeira identidade de Amara, a força primordial libertada?",
-                options: ["A Morte Original", "A Escuridão (Irmã de Deus)", "A Primeira Eva", "A Rainha do Inferno"],
-                correctAnswer: 1,
-                symbol: "eye"
-            },
-            { // T12
-                question: "No final da 11ª temporada, quem Amara traz de volta à vida como um 'presente' para Dean?",
-                options: ["Bobby Singer", "John Winchester", "Mary Winchester", "Charlie Bradbury"],
-                correctAnswer: 2,
-                symbol: "pentagram"
-            },
-            { // T13
-                question: "Quem é o pai biológico de Jack, o poderoso Nephilim?",
-                options: ["Miguel", "Castiel", "Gabriel", "Lúcifer"],
-                correctAnswer: 3,
-                symbol: "wings"
-            },
-            { // T14
-                question: "Qual Arcanjo, vindo do Mundo do Apocalipse, usa Dean como sua casca (corpo)?",
-                options: ["Rafael", "Miguel", "Lúcifer", "Gabriel"],
-                correctAnswer: 1,
-                symbol: "wings"
-            },
-            { // T15
-                question: "Qual é a música tradicional que acompanha o resumo dos grandes episódios finais da série?",
-                options: ["Knockin' on Heaven's Door", "Simple Man", "Carry On Wayward Son", "Highway to Hell"],
-                correctAnswer: 2,
-                symbol: "pentagram"
-            }
+            { question: "Qual lenda urbana foi o primeiro espírito enfrentado pelos irmãos Winchester no episódio piloto?", options: ["O Homem Gancho", "Bloody Mary", "A Mulher de Branco", "Wendigo"], correctAnswer: 2, symbol: "pentagram" },
+            { question: "Qual era o principal objetivo do Demônio dos Olhos Amarelos (Azazel) ao reunir as 'Crianças Especiais'?", options: ["Matar John Winchester", "Abrir o Portão do Inferno", "Encontrar o Colt", "Destruir os Homens das Letras"], correctAnswer: 1, symbol: "demon_trap" },
+            { question: "No icônico episódio 'Mystery Spot', qual música toca no rádio toda manhã quando Sam acorda?", options: ["Carry On Wayward Son", "Heat of the Moment", "Back in Black", "Eye of the Tiger"], correctAnswer: 1, symbol: "tulpa" },
+            { question: "Quais foram as primeiras palavras exatas de Castiel ao conhecer Dean Winchester?", options: ["Eu sou um anjo do Senhor.", "Você foi salvo, Dean.", "Eu sou aquele que te segurou firme e te tirou da perdição.", "Deus tem trabalho para nós."], correctAnswer: 2, symbol: "wings" },
+            { question: "No épico final 'Swan Song', o que ajuda Sam a retomar o controle de seu corpo contra Lúcifer?", options: ["O anel da Morte", "O Impala", "O colar do Dean", "Uma oração de Castiel"], correctAnswer: 1, symbol: "angel_rune" },
+            { question: "Quem é libertada do Purgatório e se auto-intitula a 'Mãe de Todos os Monstros'?", options: ["Lilith", "Abaddon", "Eve", "Ruby"], correctAnswer: 2, symbol: "eye" },
+            { question: "Qual produto de limpeza caseiro se revelou a principal arma e fraqueza dos Leviatãs?", options: ["Água Sanitária", "Sal Grosso", "Bórax", "Amoníaco"], correctAnswer: 2, symbol: "men_of_letters" },
+            { question: "Em qual cidade fica localizado o bunker secreto dos Homens das Letras?", options: ["Lawrence, Kansas", "Lebanon, Kansas", "Sioux Falls, Dakota do Sul", "Pontiac, Illinois"], correctAnswer: 1, symbol: "men_of_letters" },
+            { question: "Para empunhar a Primeira Espada e derrotar Abaddon, o que Dean precisou receber?", options: ["A Graça de um Arcanjo", "A Marca de Caim", "Sangue de Demônio", "A Bênção de Chuck"], correctAnswer: 1, symbol: "mark" },
+            { question: "O que acontece com Dean logo após ser morto por Metatron, devido à Marca de Caim?", options: ["Vai para o Purgatório", "Se torna um Cavaleiro do Inferno", "Ressuscita como Anjo", "Se torna um Demônio"], correctAnswer: 3, symbol: "demon_trap" },
+            { question: "Qual é a verdadeira identidade de Amara, a força primordial libertada?", options: ["A Morte Original", "A Escuridão (Irmã de Deus)", "A Primeira Eva", "A Rainha do Inferno"], correctAnswer: 1, symbol: "eye" },
+            { question: "No final da 11ª temporada, quem Amara traz de volta à vida como um 'presente' para Dean?", options: ["Bobby Singer", "John Winchester", "Mary Winchester", "Charlie Bradbury"], correctAnswer: 2, symbol: "angel_rune" },
+            { question: "Quem é o pai biológico de Jack, o poderoso Nephilim?", options: ["Miguel", "Castiel", "Gabriel", "Lúcifer"], correctAnswer: 3, symbol: "wings" },
+            { question: "Qual Arcanjo, vindo do Mundo do Apocalipse, usa Dean como sua casca (corpo)?", options: ["Rafael", "Miguel", "Lúcifer", "Gabriel"], correctAnswer: 1, symbol: "wings" },
+            { question: "Qual é a música tradicional que acompanha o resumo dos grandes episódios finais da série?", options: ["Knockin' on Heaven's Door", "Simple Man", "Carry On Wayward Son", "Highway to Hell"], correctAnswer: 2, symbol: "pentagram" }
         ];
 
-        // SVGs Estilizados
+        // 8 Símbolos diferentes em SVG puro
         const svgs = {
             pentagram: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" /></svg>`,
             wings: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10C3 10 5.5 4 12 4C18.5 4 21 10 21 10C21 10 19 14 15 14C11 14 10 9 10 9M3 10C3 10 5.5 16 9.5 16C13.5 16 14 12 14 12" /><path stroke-linecap="round" stroke-linejoin="round" d="M4 13L8 19M20 13L16 19" /></svg>`,
             mark: `<svg class="w-20 h-24 symbol-fade-in drop-shadow-[0_0_15px_rgba(220,38,38,0.7)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 2L4 14H12L11 22L20 10H12L13 2Z" /></svg>`,
-            eye: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`
+            eye: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`,
+            demon_trap: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 4L14.5 9.5L20 10.5L16 14.5L17 20L12 17.5L7 20L8 14.5L4 10.5L9.5 9.5L12 4Z" /></svg>`,
+            men_of_letters: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 19h20L12 2z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 22L22 5H2L12 22z" /><circle cx="12" cy="12" r="3"/></svg>`,
+            angel_rune: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16M8 8l8 8M16 8l-8 8" /></svg>`,
+            tulpa: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" /></svg>`
         };
 
         let currentQuestionIndex = 0;
         let isTransitioning = false;
+        let musicStarted = false;
 
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
@@ -230,39 +178,49 @@
         const revelationContainer = document.getElementById('revelation-container');
         const curtainWrapper = document.getElementById('curtain-wrapper');
         const symbolContainer = document.getElementById('symbol-container');
+        const spotlightsContainer = document.getElementById('spotlights-container');
+        const bgMusic = document.getElementById('bg-music');
+
+        function startMusicFadeIn() {
+            if (musicStarted) return;
+            musicStarted = true;
+            bgMusic.volume = 0;
+            bgMusic.play().then(() => {
+                let vol = 0;
+                const fade = setInterval(() => {
+                    if (vol < 0.3) {
+                        vol += 0.05;
+                        bgMusic.volume = vol;
+                    } else {
+                        clearInterval(fade);
+                    }
+                }, 300);
+            }).catch(e => console.log("Autoplay de música dependente de interação extra."));
+        }
 
         function renderQuestion() {
             isTransitioning = false;
             const currentQ = questions[currentQuestionIndex];
             
-            // Fade effect
             questionText.style.opacity = 0;
             symbolContainer.innerHTML = ''; 
             
             setTimeout(() => {
                 questionText.textContent = currentQ.question;
                 questionText.style.opacity = 1;
-                
-                // Injeta o SVG temático com base na pergunta
                 symbolContainer.innerHTML = svgs[currentQ.symbol];
             }, 250);
 
-            // Contador bluff (vai de 1 a 15, mas a base é "30")
             progressText.textContent = currentQuestionIndex + 1;
-            
             optionsContainer.innerHTML = ''; 
             
             currentQ.options.forEach((option, index) => {
                 const btn = document.createElement('button');
-                
-                // Design atualizado (Área Verde) - Gradientes e bordas sutis
-                btn.className = "w-full text-left p-4 rounded-xl bg-gradient-to-r from-zinc-800/80 to-zinc-900 border border-zinc-700 hover:border-red-600 hover:from-zinc-800 hover:to-zinc-800 active:border-red-500 active:shadow-[0_0_15px_rgba(220,38,38,0.2)] active:scale-[0.99] transition-all duration-200 flex items-center group shadow-md";
-                
+                btn.className = "w-full text-left p-4 rounded-xl bg-gradient-to-r from-zinc-800/80 to-zinc-900 border border-zinc-700 hover:border-red-600 active:border-red-500 active:scale-[0.99] transition-all duration-200 flex items-center group shadow-md";
                 btn.innerHTML = `
-                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-950 border border-zinc-600 flex items-center justify-center mr-4 text-xs font-bold text-zinc-400 group-active:text-red-500 group-active:border-red-500 group-hover:text-red-300 transition-colors shadow-inner">${String.fromCharCode(65 + index)}</span>
-                    <span class="text-[0.9rem] font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">${option}</span>
+                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-950 border border-zinc-600 flex items-center justify-center mr-4 text-xs font-bold text-zinc-400 group-active:text-red-500 transition-colors shadow-inner">${String.fromCharCode(65 + index)}</span>
+                    <span class="text-[0.9rem] font-medium text-zinc-300 transition-colors">${option}</span>
                 `;
-                
                 btn.onclick = () => handleAnswer(index, currentQ.correctAnswer, btn);
                 optionsContainer.appendChild(btn);
             });
@@ -271,21 +229,22 @@
         function handleAnswer(selectedIndex, correctIndex, clickedBtn) {
             if (isTransitioning) return;
             isTransitioning = true;
+            
+            // Inicia a música no primeiro clique
+            startMusicFadeIn();
 
             const buttons = optionsContainer.querySelectorAll('button');
             buttons.forEach(b => {
                 b.disabled = true;
                 b.classList.add('opacity-50', 'cursor-not-allowed');
-                b.classList.remove('hover:border-red-600', 'hover:from-zinc-800');
             });
 
-            // Feedback visual no botão clicado
             clickedBtn.classList.remove('opacity-50');
             if (selectedIndex === correctIndex) {
-                clickedBtn.classList.add('border-green-600', 'from-green-900/20', 'to-green-900/10', 'shadow-[0_0_15px_rgba(22,163,74,0.2)]');
+                clickedBtn.classList.add('border-green-600', 'from-green-900/20', 'to-green-900/10');
                 showToast("Hunter Registrado!", "Resposta capturada pelo sistema.", "success");
             } else {
-                clickedBtn.classList.add('border-red-600', 'from-red-900/30', 'to-red-900/10', 'shadow-[0_0_15px_rgba(220,38,38,0.3)]');
+                clickedBtn.classList.add('border-red-600', 'from-red-900/30', 'to-red-900/10');
                 showToast("Aviso no Sistema!", "Dado registrado na base.", "error");
             }
 
@@ -294,8 +253,7 @@
                 if (currentQuestionIndex < questions.length) {
                     renderQuestion();
                 } else {
-                    // Aqui a mágica acontece. No meio do teste (15 de 30), a cortina fecha!
-                    startRevealTransition();
+                    startTheatricalReveal();
                 }
             }, 1800);
         }
@@ -310,16 +268,9 @@
                 : `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
 
             toast.className = `bg-zinc-900/95 backdrop-blur border-b-2 ${borderColor} text-zinc-200 p-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[260px] toast-enter`;
-            toast.innerHTML = `
-                <div class="${iconColor} bg-zinc-950 p-2 rounded border border-zinc-800">${iconSvg}</div>
-                <div>
-                    <h4 class="font-bold text-[0.8rem] tracking-wide uppercase">${title}</h4>
-                    <p class="text-[0.7rem] text-zinc-400 mt-0.5">${message}</p>
-                </div>
-            `;
+            toast.innerHTML = `<div class="${iconColor} bg-zinc-950 p-2 rounded border border-zinc-800">${iconSvg}</div><div><h4 class="font-bold text-[0.8rem] tracking-wide uppercase">${title}</h4><p class="text-[0.7rem] text-zinc-400 mt-0.5">${message}</p></div>`;
             
             document.getElementById('toast-container').appendChild(toast);
-
             setTimeout(() => {
                 toast.classList.remove('toast-enter');
                 toast.classList.add('toast-leave');
@@ -327,24 +278,33 @@
             }, 2500);
         }
 
-        function startRevealTransition() {
+        function startTheatricalReveal() {
+            // 1. Fecha as cortinas vermelhas
             curtainWrapper.classList.add('curtain-closed');
             
+            // Abaixa a música de fundo um pouco para criar tensão
+            if(musicStarted) bgMusic.volume = 0.1;
+            
             setTimeout(() => {
+                // 2. Troca o conteúdo por baixo dos panos
                 quizContainer.classList.add('hidden');
                 revelationContainer.classList.remove('hidden');
                 revelationContainer.classList.add('flex');
                 
+                // 3. Acende os holofotes e deixa eles dançarem na tela
+                spotlightsContainer.classList.add('spotlights-active');
+                
+                // 4. Depois de 4 segundos de show de luzes, apaga e abre a cortina
                 setTimeout(() => {
-                    curtainWrapper.classList.remove('curtain-closed');
-                }, 500);
-            }, 1500);
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(() => {});
-            });
+                    spotlightsContainer.classList.remove('spotlights-active');
+                    
+                    setTimeout(() => {
+                        curtainWrapper.classList.remove('curtain-closed');
+                    }, 1000); // tempo do fadeout da luz
+                    
+                }, 4000); // 4 segundos de suspense
+                
+            }, 2000); // tempo para fechar totalmente a cortina
         }
 
         renderQuestion();
