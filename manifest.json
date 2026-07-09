@@ -1,14 +1,15 @@
 {
-  "name": "Adega ERP",
-  "short_name": "Adega",
-  "description": "Sistema de Controle de Estoque",
+  "name": "Projeto de Férias - ADS FATEC",
+  "short_name": "Quiz ADS",
+  "description": "Projeto de avaliação frontend com tema Supernatural.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#1e293b",
+  "background_color": "#09090b",
+  "theme_color": "#7f1d1d",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2405/2405988.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067253.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
