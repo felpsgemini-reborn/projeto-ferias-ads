@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque Adega - ERP</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <!-- ================= TELA DE LOGIN ================= -->
+    <div id="telaLogin" class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800">🍷 Adega ERP</h1>
+                <p class="text-slate-500 mt-2">Acesso ao Sistema</p>
+            </div>
+            
+            <form id="formLogin" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nome de Usuário</label>
+                    <input type="text" id="usuarioLogin" required class="w-full border border-slate-300 p-3 rounded focus:outline-none focus:border-blue-500" placeholder="Ex: admin">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Senha</label>
+                    <input type="password" id="senhaLogin" required class="w-full border border-slate-300 p-3 rounded focus:outline-none focus:border-blue-500" placeholder="••••••••">
+                </div>
+                <button type="submit" id="btnEntrar" class="w-full bg-blue-600 text-white font-bold p-3 rounded hover:bg-blue-700 transition">Entrar no Sistema</button>
+            </form>
+            <p id="msgErroLogin" class="mt-4 text-center text-red-600 text-sm hidden font-semibold"></p>
+        </div>
+    </div>
+
+    <!-- ================= TELA DO APLICATIVO ================= -->
+    <div id="telaApp" class="max-w-7xl mx-auto space-y-6 p-4 md:p-8 hidden">
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <h1 class="text-2xl font-bold text-slate-800">🍷 Gestão de Adega</h1>
+                <div class="flex items-center space-x-3">
+                    <button id="btnVisao" class="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 px-3 py-1 rounded font-semibold transition text-sm flex items-center shadow-sm">
+                        👁️ Modo Gestor
+                    </button>
+                    <button id="btnSair" class="bg-slate-200 text-slate-700 hover:bg-red-500 hover:text-white px-3 py-1 rounded font-semibold transition text-sm">Sair</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Financeiro -->
+            <div id="dashboardFinanceiro" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 hidden">
+                <div class="bg-slate-50 p-4 rounded-md border border-slate-200 shadow-sm flex items-center justify-between border-l-4 border-blue-500">
+                    <div>
+                        <p class="text-sm text-slate-500 font-semibold uppercase">Capital Investido</p>
+                        <p class="text-2xl font-bold text-slate-800" id="totalCusto">R$ 0,00</p>
+                    </div>
+                    <div class="text-blue-500 text-4xl">📦</div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-md border border-slate-200 shadow-sm flex items-center justify-between border-l-4 border-green-500">
+                    <div>
+                        <p class="text-sm text-slate-500 font-semibold uppercase">Expectativa Venda Base</p>
+                        <p class="text-2xl font-bold text-slate-800" id="totalVenda">R$ 0,00</p>
+                    </div>
+                    <div class="text-green-500 text-4xl">💰</div>
+                </div>
+            </div>
+
+            <!-- Banner de Alerta de Estoque Baixo (Inicia Oculto) -->
+            <div id="alertaEstoqueBaixo" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
+                <div class="flex items-center">
+                    <span class="text-3xl mr-4">⚠️</span>
+                    <div>
+                        <h3 class="text-red-800 font-bold text-lg">Atenção ao Estoque!</h3>
+                        <p class="text-red-600 text-sm font-semibold" id="textoAlertaEstoque">Há produtos precisando de reposição.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulário de Cadastro -->
+            <div class="bg-slate-50 p-5 rounded-md border border-slate-200 mb-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-700 mb-4">Adicionar Item</h2>
+                <form id="formProduto" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-3 items-end">
+                    
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1">Nome da Bebida</label>
+                        <input type="text" id="nome" placeholder="Ex: Heineken" required class="w-full border border-slate-300 p-2 rounded focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1">Categoria</label>
+                        <select id="categoria" class="w-full border border-slate-300 p-2 rounded focus:outline-none focus:border-blue-500">
+                            <option value="Dose/Copão">Dose/Copão</option>
+                            <option value="Cerveja">Cerveja</option>
+                            <option value="Vinho">Vinho</option>
+                            <option value="Vodka">Vodka</option>
+                            <option value="Whisky">Whisky</option>
+                            <option value="Energético">Energético</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="lg:col-span-1">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1">Volume</label>
+                        <input type="text" id="volume" placeholder="Ex: 1L" required class="w-full border border-slate-300 p-2 rounded focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Novo Campo: Estoque Mínimo -->
+                    <div id="blocoEstoqueMin" class="lg:col-span-1">
+                        <label class="block text-xs text-red-500 font-semibold mb-1" title="O sistema vai alertar quando chegar nesse número">Qtd. Mínima</label>
+                        <input type="number" id="estoqueMinimo" placeholder="Alerta" class="w-full border border-red-200 p-2 rounded focus:outline-none focus:border-red-500 bg-red-50">
+                    </div>
+                    
+                    <!-- Blocos de Quantidade Dinâmicos -->
+                    <div id="blocoQtdNormal" class="lg:col-span-1">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1">Qtd Atual</label>
+                        <input type="number" id="quantidade" placeholder="Qtd" class="w-full border border-slate-300 p-2 rounded focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div id="blocoQtdCerveja" class="lg:col-span-2 hidden grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-500 font-semibold mb-1">Fardos</label>
+                            <input type="number" id="qtdFardos" placeholder="Qtd" class="w-full border border-orange-300 p-2 rounded focus:outline-none focus:border-orange-500 bg-orange-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 font-semibold mb-1">Latas/Fardo</label>
+                            <input type="number" id="tamFardo" placeholder="Unid" class="w-full border border-orange-300 p-2 rounded focus:outline-none focus:border-orange-500 bg-orange-50">
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-1">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1">Custo (R$)</label>
+                        <input type="number" step="0.01" id="precoCusto" placeholder="Op." class="w-full border border-slate-300 p-2 rounded focus:outline-none focus:border-blue-500 bg-white">
+                    </div>
+                    
+                    <div class="lg:col-span-1">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1" id="labelPrecoVenda">Venda (R$)</label>
+                        <input type="number" step="0.01" id="precoVenda" placeholder="Unid." class="w-full border border-slate-300 p-2 rounded focus:outline-none focus:border-blue-500 bg-white">
+                    </div>
+                    
+                    <!-- Este bloco some para Copões -->
+                    <div id="blocoAtacado" class="lg:col-span-2">
+                        <label class="block text-xs text-slate-500 font-semibold mb-1" id="labelPrecoAtacado">Venda Especial (R$)</label>
+                        <input type="number" step="0.01" id="precoAtacado" placeholder="Combo/Fardo" class="w-full border border-blue-200 p-2 rounded focus:outline-none focus:border-blue-500 bg-blue-50 text-blue-900">
+                    </div>
+                    
+                    <div class="lg:col-span-1">
+                        <button type="submit" class="w-full bg-blue-600 text-white font-semibold p-2 rounded hover:bg-blue-700 transition h-10">Salvar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Barra de Pesquisa -->
+            <div class="mb-4">
+                <input type="text" id="campoPesquisa" placeholder="🔍 Buscar por nome ou categoria..." class="w-full border border-slate-300 p-3 rounded-md focus:outline-none focus:border-blue-500 shadow-sm text-slate-700">
+            </div>
+
+            <!-- Tabela de Estoque -->
+            <div class="overflow-x-auto pb-4">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-slate-800 text-white">
+                            <th class="p-3 rounded-tl-md">Item</th>
+                            <th class="p-3">Cat.</th>
+                            <th class="p-3">Vol.</th>
+                            <th class="p-3 text-center col-financeira hidden">Custo</th>
+                            <th class="p-3 text-center">Venda Unid.</th>
+                            <th class="p-3 text-center">Combo/Fardo</th>
+                            <th class="p-3 text-center col-financeira hidden">Lucro un.</th>
+                            <th class="p-3 text-center">Estoque</th>
+                            <th class="p-3 text-center rounded-tr-md">Caixa Rápido</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaEstoque" class="text-slate-700"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bloco Histórico de Vendas -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-slate-800 mb-4">📜 Últimas Vendas (Hoje)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-300">
+                            <th class="p-3">Data/Hora</th>
+                            <th class="p-3">Item</th>
+                            <th class="p-3 text-center">Formato</th>
+                            <th class="p-3 text-center">Valor Cobrado</th>
+                            <th class="p-3 text-center col-financeira hidden">Lucro</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaHistorico" class="text-slate-600"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script>
+        const supabaseUrl = 'https://nkbvqzkshyoxerdfdwlg.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rYnZxemtzaHlveGVyZGZkd2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzEzMTksImV4cCI6MjA5ODgwNzMxOX0.EEX1lNaHxV2P7On2VrY68hpR2fyxRgjtr7mMKnpYPO0';
+        const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+        const telaLogin = document.getElementById('telaLogin');
+        const telaApp = document.getElementById('telaApp');
+        const formLogin = document.getElementById('formLogin');
+        const msgErroLogin = document.getElementById('msgErroLogin');
+        const btnSair = document.getElementById('btnSair');
+        
+        let modoGestor = false;
+        const btnVisao = document.getElementById('btnVisao');
+        const dashboardFinanceiro = document.getElementById('dashboardFinanceiro');
+        const bannerAlerta = document.getElementById('alertaEstoqueBaixo');
+        const textoAlerta = document.getElementById('textoAlertaEstoque');
+
+        // ================= LÓGICA DO FORMULÁRIO DINÂMICO =================
+        const selectCategoria = document.getElementById('categoria');
+        const blocoQtdNormal = document.getElementById('blocoQtdNormal');
+        const blocoQtdCerveja = document.getElementById('blocoQtdCerveja');
+        const blocoAtacado = document.getElementById('blocoAtacado');
+        const blocoEstoqueMin = document.getElementById('blocoEstoqueMin'); // Novo bloco
+        const labelPrecoVenda = document.getElementById('labelPrecoVenda');
+        const labelPrecoAtacado = document.getElementById('labelPrecoAtacado');
+        const inputPrecoVenda = document.getElementById('precoVenda');
+        const inputPrecoAtacado = document.getElementById('precoAtacado');
+        const inputQuantidade = document.getElementById('quantidade');
+
+        function ajustarFormulario() {
+            const cat = selectCategoria.value;
+
+            blocoQtdNormal.classList.remove('hidden');
+            blocoQtdCerveja.classList.add('hidden');
+            blocoQtdCerveja.classList.remove('grid');
+            blocoAtacado.classList.remove('hidden');
+            blocoEstoqueMin.classList.remove('hidden');
+
+            if (cat === 'Cerveja') {
+                blocoQtdNormal.classList.add('hidden');
+                blocoQtdCerveja.classList.remove('hidden');
+                blocoQtdCerveja.classList.add('grid');
+                labelPrecoVenda.innerText = 'Venda Lata (R$)';
+                labelPrecoAtacado.innerText = 'Venda Fardo (R$)';
+                inputPrecoAtacado.placeholder = "Fardo";
+            } 
+            else if (cat === 'Dose/Copão') {
+                blocoQtdNormal.classList.add('hidden');
+                blocoAtacado.classList.add('hidden');
+                blocoEstoqueMin.classList.add('hidden'); // Copão não tem mínimo
+                labelPrecoVenda.innerText = 'Venda Copão (R$)';
+                inputPrecoVenda.placeholder = "Preço";
+            } 
+            else {
+                labelPrecoVenda.innerText = 'Venda Unid. (R$)';
+                labelPrecoAtacado.innerText = 'Venda Combo (R$)';
+                inputPrecoAtacado.placeholder = "Combo (Op.)";
+                inputQuantidade.placeholder = "Qtd";
+            }
+        }
+
+        selectCategoria.addEventListener('change', ajustarFormulario);
+        ajustarFormulario(); 
+        // =================================================================
+
+        btnVisao.addEventListener('click', () => {
+            modoGestor = !modoGestor;
+            if(modoGestor) {
+                dashboardFinanceiro.classList.remove('hidden');
+                btnVisao.innerText = '👁️ Modo Caixa';
+                btnVisao.classList.replace('bg-indigo-100', 'bg-emerald-100');
+                btnVisao.classList.replace('text-indigo-800', 'text-emerald-800');
+            } else {
+                dashboardFinanceiro.classList.add('hidden');
+                btnVisao.innerText = '👁️ Modo Gestor';
+                btnVisao.classList.replace('bg-emerald-100', 'bg-indigo-100');
+                btnVisao.classList.replace('text-emerald-800', 'text-indigo-800');
+            }
+            aplicarFiltro(); 
+        });
+
+        async function checarSessao() {
+            const { data: { session } } = await db.auth.getSession();
+            if (session) mostrarAplicativo();
+        }
+
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnEntrar = document.getElementById('btnEntrar');
+            btnEntrar.innerText = "Verificando...";
+            msgErroLogin.classList.add('hidden');
+
+            const emailFicticio = document.getElementById('usuarioLogin').value.trim().toLowerCase() + "@adega.com";
+            const senha = document.getElementById('senhaLogin').value;
+
+            const { error } = await db.auth.signInWithPassword({ email: emailFicticio, password: senha });
+            if (error) {
+                msgErroLogin.innerText = "Usuário ou senha incorretos.";
+                msgErroLogin.classList.remove('hidden');
+                btnEntrar.innerText = "Entrar";
+            } else { mostrarAplicativo(); }
+        });
+
+        btnSair.addEventListener('click', async () => {
+            await db.auth.signOut();
+            telaApp.classList.add('hidden');
+            telaLogin.classList.remove('hidden');
+            document.getElementById('senhaLogin').value = ''; 
+        });
+
+        function mostrarAplicativo() {
+            telaLogin.classList.add('hidden');
+            telaApp.classList.remove('hidden');
+            carregarEstoque(); carregarHistorico();
+        }
+
+        checarSessao();
+
+        const formProduto = document.getElementById('formProduto');
+        const tabela = document.getElementById('tabelaEstoque');
+        const tabelaHistorico = document.getElementById('tabelaHistorico');
+        const campoPesquisa = document.getElementById('campoPesquisa');
+        
+        let estoqueGlobal = [];
+
+        const formatarMoeda = (valor) => valor > 0 ? Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-';
+        const formatarData = (dataIso) => {
+            const d = new Date(dataIso);
+            return `${d.toLocaleDateString('pt-BR').slice(0,5)} ${d.toLocaleTimeString('pt-BR').slice(0,5)}`;
+        };
+
+        function atualizarDashboard(dados) {
+            let totalCusto = 0; let totalVenda = 0;
+            dados.forEach(produto => {
+                if(produto.quantidade !== null) {
+                    totalCusto += (parseFloat(produto.preco_custo) || 0) * produto.quantidade;
+                    totalVenda += (parseFloat(produto.preco_venda) || 0) * produto.quantidade;
+                }
+            });
+            document.getElementById('totalCusto').innerText = formatarMoeda(totalCusto);
+            document.getElementById('totalVenda').innerText = formatarMoeda(totalVenda);
+        }
+
+        function renderizarTabela(dados) {
+            tabela.innerHTML = ''; 
+            atualizarDashboard(dados);
+
+            document.querySelectorAll('th.col-financeira').forEach(th => {
+                modoGestor ? th.classList.remove('hidden') : th.classList.add('hidden');
+            });
+
+            if (dados.length === 0) { tabela.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">Nenhum item cadastrado.</td></tr>`; return; }
+
+            let produtosEmFalta = 0; // Contador de alertas
+
+            dados.forEach((produto) => {
+                const custo = parseFloat(produto.preco_custo) || 0;
+                const vendaUnid = parseFloat(produto.preco_venda) || 0;
+                const vendaAtacado = parseFloat(produto.preco_atacado) || 0;
+                const estMinimo = parseInt(produto.estoque_minimo) || 0; // Pega o limite definido
+                const lucro = vendaUnid - custo;
+                
+                const corLucro = lucro >= 0 ? 'text-green-600 font-bold' : 'text-red-600 font-bold';
+                const visibilidadeFinanceira = modoGestor ? '' : 'hidden';
+                const nomeEscapado = produto.nome.replace(/'/g, "\\'");
+                
+                let displayEstoque = '';
+                let alertaEstoque = 'text-slate-800 font-bold';
+
+                if (produto.quantidade === null) {
+                    displayEstoque = '<span class="text-2xl text-blue-500">∞</span> <br><span class="text-[10px] uppercase text-slate-400 font-bold">Livre</span>';
+                } else {
+                    // Verifica se bateu a regra do mínimo
+                    if (produto.quantidade <= estMinimo) {
+                        alertaEstoque = 'text-red-600 font-bold text-lg';
+                        produtosEmFalta++; // Aumenta o contador para mostrar o banner lá em cima
+                    }
+
+                    if (produto.tamanho_fardo > 0) {
+                        const fardos = Math.floor(produto.quantidade / produto.tamanho_fardo);
+                        const sobra = produto.quantidade % produto.tamanho_fardo;
+                        displayEstoque = `<div class="text-sm"><b>${fardos}</b> Fd<br><span class="text-slate-500 font-normal text-xs">+ ${sobra} Un</span></div>`;
+                    } else {
+                        displayEstoque = `${produto.quantidade}`;
+                    }
+                }
+
+                let botoesVenda = '';
+                if (vendaUnid > 0 || custo === 0) {
+                    let lblVenda = produto.categoria === 'Dose/Copão' ? '🛒 Vender' : '🛒 Unid';
+                    botoesVenda += `<button onclick="registrarVenda(${produto.id}, '${nomeEscapado} (Unid)', ${vendaUnid}, ${lucro}, ${produto.quantidade === null ? 'null' : produto.quantidade}, 1)" class="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 text-sm font-bold shadow mr-1">${lblVenda}</button>`;
+                }
+                if (vendaAtacado > 0) {
+                    const lucroAtacado = vendaAtacado - (custo * (produto.tamanho_fardo || 1));
+                    const abateFardo = produto.tamanho_fardo || 1; 
+                    let lblAtacado = produto.categoria === 'Cerveja' ? '🛒 Fardo' : '🛒 Combo';
+                    botoesVenda += `<button onclick="registrarVenda(${produto.id}, '${nomeEscapado} (${lblAtacado.replace('🛒 ', '')})', ${vendaAtacado}, ${lucroAtacado}, ${produto.quantidade === null ? 'null' : produto.quantidade}, ${abateFardo})" class="bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 text-sm font-bold shadow mr-1">${lblAtacado}</button>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-200 hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${produto.nome}</td>
+                    <td class="p-3"><span class="bg-slate-200 px-2 py-1 rounded text-xs font-semibold">${produto.categoria}</span></td>
+                    <td class="p-3 text-slate-500">${produto.volume}</td>
+                    
+                    <td class="p-3 text-center text-slate-600 ${visibilidadeFinanceira}">${formatarMoeda(custo)}</td>
+                    <td class="p-3 text-center font-semibold text-slate-800">${formatarMoeda(vendaUnid)}</td>
+                    <td class="p-3 text-center font-semibold text-indigo-700">${formatarMoeda(vendaAtacado)}</td>
+                    <td class="p-3 text-center ${visibilidadeFinanceira} ${corLucro}">${formatarMoeda(lucro)}</td>
+                    
+                    <td class="p-3 text-center ${alertaEstoque}">${displayEstoque}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        ${botoesVenda}
+                        <button onclick="alterarQuantidade(${produto.id}, ${produto.quantidade === null ? 'null' : produto.quantidade}, 1)" class="bg-green-500 text-white px-2 py-1.5 rounded hover:bg-green-600 text-sm font-bold shadow ml-1">+</button>
+                        <button onclick="alterarQuantidade(${produto.id}, ${produto.quantidade === null ? 'null' : produto.quantidade}, -1)" class="bg-yellow-500 text-white px-2 py-1.5 rounded hover:bg-yellow-600 text-sm font-bold shadow mr-2">-</button>
+                        <button onclick="deletarProduto(${produto.id})" class="bg-red-400 text-white px-2 py-1.5 rounded hover:bg-red-500 text-sm font-bold shadow">🗑️</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+
+            // Gerencia a exibição do Banner de Aviso Global
+            if (produtosEmFalta > 0) {
+                bannerAlerta.classList.remove('hidden');
+                textoAlerta.innerText = `Há ${produtosEmFalta} produto(s) abaixo da quantidade mínima. Considere acionar o fornecedor.`;
+            } else {
+                bannerAlerta.classList.add('hidden');
+            }
+        }
+
+        function aplicarFiltro() {
+            const termo = campoPesquisa.value.toLowerCase();
+            renderizarTabela(estoqueGlobal.filter(produto => 
+                produto.nome.toLowerCase().includes(termo) || produto.categoria.toLowerCase().includes(termo)
+            ));
+        }
+
+        campoPesquisa.addEventListener('input', aplicarFiltro);
+
+        async function carregarEstoque() {
+            const { data: estoque, error } = await db.from('estoque').select('*').order('id', { ascending: true });
+            if (!error) { estoqueGlobal = estoque; aplicarFiltro(); }
+        }
+
+        async function carregarHistorico() {
+            const { data: vendas, error } = await db.from('historico_vendas').select('*').order('created_at', { ascending: false }).limit(10);
+            tabelaHistorico.innerHTML = '';
+            
+            if (error || !vendas || vendas.length === 0) {
+                tabelaHistorico.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nenhuma venda.</td></tr>`; return;
+            }
+
+            const visibilidadeFinanceira = modoGestor ? '' : 'hidden';
+
+            vendas.forEach(venda => {
+                const corLucro = venda.lucro_obtido >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+                const tipoVenda = venda.nome_bebida.includes('Fardo') || venda.nome_bebida.includes('Combo') ? '<span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-[10px] uppercase font-bold">Atacado</span>' : '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-[10px] uppercase font-bold">Varejo</span>';
+                
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 text-xs text-slate-500 font-semibold">${formatarData(venda.created_at)}</td>
+                    <td class="p-3 font-medium text-slate-800">${venda.nome_bebida}</td>
+                    <td class="p-3 text-center">${tipoVenda}</td>
+                    <td class="p-3 text-center text-slate-800 font-bold">${formatarMoeda(venda.valor_venda)}</td>
+                    <td class="p-3 text-center ${visibilidadeFinanceira} ${corLucro}">${formatarMoeda(venda.lucro_obtido)}</td>
+                `;
+                tabelaHistorico.appendChild(tr);
+            });
+        }
+
+        formProduto.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btnSubmit = formProduto.querySelector('button[type="submit"]');
+            btnSubmit.innerText = "Salvando..."; btnSubmit.disabled = true;
+            
+            const pCusto = parseFloat(document.getElementById('precoCusto').value) || null;
+            const pVenda = parseFloat(document.getElementById('precoVenda').value) || null;
+            const pAtacado = parseFloat(document.getElementById('precoAtacado').value) || null;
+            const eMin = parseInt(document.getElementById('estoqueMinimo').value) || 0; // Resgata o limite
+            
+            const categoriaSel = document.getElementById('categoria').value;
+            let qtdFinal = null;
+            let tamFardo = null;
+
+            if (categoriaSel === 'Cerveja') {
+                const fardos = parseInt(document.getElementById('qtdFardos').value) || 0;
+                tamFardo = parseInt(document.getElementById('tamFardo').value) || 0;
+                if (fardos > 0 && tamFardo > 0) {
+                    qtdFinal = fardos * tamFardo;
+                }
+            } else if (categoriaSel !== 'Dose/Copão') {
+                const valQtd = document.getElementById('quantidade').value;
+                qtdFinal = valQtd === '' ? null : parseInt(valQtd);
+            }
+
+            const novoProduto = {
+                nome: document.getElementById('nome').value, 
+                categoria: categoriaSel,
+                volume: document.getElementById('volume').value, 
+                quantidade: qtdFinal,
+                tamanho_fardo: tamFardo,
+                estoque_minimo: categoriaSel === 'Dose/Copão' ? null : eMin, // Registra o limite
+                preco_custo: pCusto, 
+                preco_venda: pVenda,
+                preco_atacado: categoriaSel === 'Dose/Copão' ? null : pAtacado 
+            };
+
+            const { error } = await db.from('estoque').insert([novoProduto]);
+            if(error) { alert("Erro ao salvar no banco. Lembre-se da coluna 'estoque_minimo'."); console.error(error); }
+            
+            formProduto.reset(); 
+            ajustarFormulario(); 
+
+            await carregarEstoque();
+            btnSubmit.innerText = "Salvar"; btnSubmit.disabled = false;
+        });
+
+        async function registrarVenda(id, nomeBebida, valorVenda, lucroObtido, quantidadeAtual, abate) {
+            if (quantidadeAtual !== null) {
+                if (quantidadeAtual < abate) { alert("Estoque insuficiente para essa venda!"); return; }
+                await db.from('estoque').update({ quantidade: quantidadeAtual - abate }).eq('id', id);
+            }
+            await db.from('historico_vendas').insert([{ nome_bebida: nomeBebida, valor_venda: valorVenda, lucro_obtido: lucroObtido }]);
+            carregarEstoque(); carregarHistorico();
+        }
+
+        async function alterarQuantidade(id, quantidadeAtual, valor) {
+            if (quantidadeAtual !== null) {
+                if (quantidadeAtual + valor >= 0) { 
+                    await db.from('estoque').update({ quantidade: quantidadeAtual + valor }).eq('id', id); 
+                    carregarEstoque(); 
+                }
+            } else {
+                alert("Este item tem quantidade Livre (Infinito). Não precisa de ajuste manual.");
+            }
+        }
+
+        async function deletarProduto(id) {
+            if (confirm("Tem certeza que deseja remover?")) { await db.from('estoque').delete().eq('id', id); carregarEstoque(); }
+        }
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .catch(err => console.log('Erro no Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
