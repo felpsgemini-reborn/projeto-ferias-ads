@@ -7,71 +7,268 @@
     <title>Projeto ADS - Quiz</title>
     
     <link rel="manifest" href="manifest.json">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Otimização mobile */
         * {
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* Efeito Cortina */
+        .curtain-panel {
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+        .curtain-closed .curtain-panel {
+            width: 50%;
+        }
+
+        /* Animações do Toast */
+        .toast-enter {
+            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .toast-leave {
+            animation: fadeOutRight 0.5s forwards;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-red-900 selection:text-white">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-red-900 selection:text-white overflow-x-hidden">
 
-    <header class="w-full p-4 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm fixed top-0 z-10 flex flex-col items-center justify-center shadow-md">
-        <span class="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">FATEC - Análise e Desenvolvimento de Sistemas</span>
-        <h1 class="text-lg font-bold text-zinc-200 mt-1">Projeto de Férias <span class="text-red-700">|</span> Frontend</h1>
-    </header>
-
-    <main class="flex-1 w-full max-w-md mx-auto mt-20 p-5 flex flex-col">
+    <div id="quiz-container" class="flex flex-col min-h-screen w-full transition-opacity duration-1000">
         
-        <div class="bg-zinc-900 border border-red-900/40 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex-1 flex flex-col">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-zinc-900 via-red-800 to-zinc-900"></div>
+        <header class="w-full p-4 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm fixed top-0 z-10 flex flex-col items-center justify-center shadow-md">
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">FATEC - Análise e Desenvolvimento de Sistemas</span>
+            <h1 class="text-lg font-bold text-zinc-200 mt-1">Projeto de Férias <span class="text-red-700">|</span> Frontend</h1>
+        </header>
 
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-xs font-medium text-zinc-400 bg-zinc-800 px-3 py-1 rounded-full">Tema: Supernatural</span>
-                <span class="text-xs font-bold text-red-500">1 / 3</span>
+        <main class="flex-1 w-full max-w-md mx-auto mt-20 p-5 flex flex-col mb-4">
+            <div class="bg-zinc-900 border border-red-900/40 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex-1 flex flex-col">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-zinc-900 via-red-800 to-zinc-900"></div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-xs font-medium text-zinc-400 bg-zinc-800 px-3 py-1 rounded-full">Tema: Supernatural</span>
+                    <span id="progress-text" class="text-xs font-bold text-red-500">1 / 10</span>
+                </div>
+
+                <h2 id="question-text" class="text-xl font-semibold leading-snug mb-8 text-center text-zinc-100">
+                    Carregando pergunta...
+                </h2>
+
+                <div id="options-container" class="flex flex-col gap-3 mt-auto mb-2"></div>
             </div>
+        </main>
+    </div>
 
-            <h2 class="text-xl font-semibold leading-snug mb-8 text-center text-zinc-100">
-                Qual é o modelo e o ano do carro icônico dos irmãos Winchester?
-            </h2>
-
-            <div class="flex flex-col gap-3 mt-auto mb-4">
-                <button class="w-full text-left p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 active:bg-zinc-700 active:border-red-600 transition-colors flex items-center group">
-                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-900 border border-zinc-600 flex items-center justify-center mr-3 text-sm font-bold text-zinc-400 group-active:text-red-500 group-active:border-red-500">A</span>
-                    <span class="text-sm font-medium">Ford Mustang 1969</span>
-                </button>
-
-                <button class="w-full text-left p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 active:bg-zinc-700 active:border-red-600 transition-colors flex items-center group">
-                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-900 border border-zinc-600 flex items-center justify-center mr-3 text-sm font-bold text-zinc-400 group-active:text-red-500 group-active:border-red-500">B</span>
-                    <span class="text-sm font-medium">Chevrolet Impala 1967</span>
-                </button>
-
-                <button class="w-full text-left p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 active:bg-zinc-700 active:border-red-600 transition-colors flex items-center group">
-                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-900 border border-zinc-600 flex items-center justify-center mr-3 text-sm font-bold text-zinc-400 group-active:text-red-500 group-active:border-red-500">C</span>
-                    <span class="text-sm font-medium">Dodge Charger 1970</span>
-                </button>
-
-                <button class="w-full text-left p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 active:bg-zinc-700 active:border-red-600 transition-colors flex items-center group">
-                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-900 border border-zinc-600 flex items-center justify-center mr-3 text-sm font-bold text-zinc-400 group-active:text-red-500 group-active:border-red-500">D</span>
-                    <span class="text-sm font-medium">Pontiac GTO 1965</span>
-                </button>
-            </div>
+    <div id="revelation-container" class="hidden min-h-screen w-full bg-rose-50 flex-col items-center justify-center p-6 transition-opacity duration-1000 fixed inset-0 z-40 overflow-y-auto">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-[0_20px_50px_rgba(225,_29,_72,_0.1)] p-8 text-center">
+            <h1 class="text-3xl font-serif text-gray-800 mb-6">Surpresa...</h1>
+            <p class="text-base text-gray-600 leading-relaxed mb-6">
+                A verdade é que esse site não é um trabalho de férias. Foi só uma desculpa que eu inventei para criar algo especial para você.
+            </p>
+            <p class="text-base text-gray-600 leading-relaxed">
+                (O texto real entrará aqui na próxima etapa!)
+            </p>
         </div>
-    </main>
+    </div>
+
+    <div id="curtain-wrapper" class="fixed inset-0 z-50 pointer-events-none flex">
+        <div id="curtain-left" class="curtain-panel h-full bg-zinc-950 border-r border-red-900/30"></div>
+        <div id="curtain-right" class="curtain-panel h-full bg-zinc-950 border-l border-red-900/30 ml-auto"></div>
+    </div>
+
+    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-3 max-w-[90vw]"></div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
-                    });
+        // 1. BANCO DE PERGUNTAS (10 Perguntas)
+        const questions = [
+            {
+                question: "Qual é o modelo e o ano do carro icônico dos irmãos Winchester?",
+                options: ["Ford Mustang 1969", "Chevrolet Impala 1967", "Dodge Charger 1970", "Pontiac GTO 1965"],
+                correctAnswer: 1
+            },
+            {
+                question: "Qual é o nome dos pais de Sam e Dean?",
+                options: ["John e Mary", "Bobby e Ellen", "Arthur e Amelia", "Henry e Josie"],
+                correctAnswer: 0
+            },
+            {
+                question: "Em qual cidade e estado os irmãos Winchester nasceram?",
+                options: ["Sioux Falls, Dakota do Sul", "Pontiac, Illinois", "Lawrence, Kansas", "Líbano, Kansas"],
+                correctAnswer: 2
+            },
+            {
+                question: "Qual é o nome do caçador veterano que serve como uma figura paterna para os irmãos?",
+                options: ["Garth Fitzgerald", "Rufus Turner", "Ash", "Bobby Singer"],
+                correctAnswer: 3
+            },
+            {
+                question: "Qual é o nome do anjo que tira o Dean do inferno na 4ª temporada?",
+                options: ["Gabriel", "Lucifer", "Castiel", "Miguel"],
+                correctAnswer: 2
+            },
+            {
+                question: "Qual demônio dos cruzamentos acaba se tornando o Rei do Inferno?",
+                options: ["Azazel", "Crowley", "Meg", "Lilith"],
+                correctAnswer: 1
+            },
+            {
+                question: "Quem é o profeta que escreve os livros que narram a vida dos Winchesters?",
+                options: ["Chuck Shurley", "Kevin Tran", "Donatello Redfield", "Metatron"],
+                correctAnswer: 0
+            },
+            {
+                question: "Qual arma mítica é famosa por conseguir matar quase qualquer coisa na criação?",
+                options: ["A Primeira Espada", "A Faca da Ruby", "A Foice da Morte", "O Colt"],
+                correctAnswer: 3
+            },
+            {
+                question: "Qual demônio manipulou Sam para que ele bebesse sangue de demônio?",
+                options: ["Meg", "Lilith", "Ruby", "Abaddon"],
+                correctAnswer: 2
+            },
+            {
+                question: "Qual música toca tradicionalmente no resumo do último episódio de quase todas as temporadas?",
+                options: ["Back in Black", "Carry On Wayward Son", "Highway to Hell", "Eye of the Tiger"],
+                correctAnswer: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let isTransitioning = false;
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressText = document.getElementById('progress-text');
+        const quizContainer = document.getElementById('quiz-container');
+        const revelationContainer = document.getElementById('revelation-container');
+        const curtainWrapper = document.getElementById('curtain-wrapper');
+
+        // 2. RENDERIZAR PERGUNTA
+        function renderQuestion() {
+            isTransitioning = false;
+            const currentQ = questions[currentQuestionIndex];
+            
+            // Efeito de fade no texto
+            questionText.style.opacity = 0;
+            setTimeout(() => {
+                questionText.textContent = currentQ.question;
+                questionText.style.opacity = 1;
+            }, 200);
+
+            progressText.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+            optionsContainer.innerHTML = ''; 
+            
+            currentQ.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                // Estilo mobile-first (idêntico ao aprovado visualmente)
+                btn.className = "w-full text-left p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 hover:border-red-700 hover:bg-zinc-800 active:bg-zinc-700 active:border-red-600 transition-all duration-200 flex items-center group";
+                
+                btn.innerHTML = `
+                    <span class="w-8 h-8 flex-shrink-0 rounded-full bg-zinc-900 border border-zinc-600 flex items-center justify-center mr-3 text-sm font-bold text-zinc-400 group-active:text-red-500 group-active:border-red-500 transition-colors">${String.fromCharCode(65 + index)}</span>
+                    <span class="text-sm font-medium">${option}</span>
+                `;
+                
+                btn.onclick = () => handleAnswer(index, currentQ.correctAnswer, btn);
+                optionsContainer.appendChild(btn);
             });
         }
+
+        // 3. PROCESSAR RESPOSTA
+        function handleAnswer(selectedIndex, correctIndex, clickedBtn) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const buttons = optionsContainer.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-70', 'cursor-not-allowed');
+            });
+
+            // Feedback visual no botão clicado
+            if (selectedIndex === correctIndex) {
+                clickedBtn.classList.replace('border-zinc-700', 'border-green-600');
+                clickedBtn.classList.replace('bg-zinc-800/50', 'bg-green-900/30');
+                showToast("Hunter Nível Máximo!", "Resposta correta.", "success");
+            } else {
+                clickedBtn.classList.replace('border-zinc-700', 'border-red-600');
+                clickedBtn.classList.replace('bg-zinc-800/50', 'bg-red-900/30');
+                showToast("Ops, quase!", "O sistema registrou a resposta.", "error");
+            }
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    renderQuestion();
+                } else {
+                    startRevealTransition();
+                }
+            }, 1800);
+        }
+
+        // 4. SISTEMA DE TOASTS
+        function showToast(title, message, type) {
+            const toast = document.createElement('div');
+            const borderColor = type === 'success' ? 'border-green-500' : 'border-red-500';
+            const iconColor = type === 'success' ? 'text-green-500' : 'text-red-500';
+            
+            const iconSvg = type === 'success' 
+                ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                : `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+            toast.className = `bg-zinc-900 border-l-4 ${borderColor} text-zinc-100 p-4 rounded-xl shadow-2xl flex items-center gap-4 min-w-[280px] toast-enter border border-zinc-800`;
+            toast.innerHTML = `
+                <div class="${iconColor} bg-zinc-800 p-2 rounded-lg">${iconSvg}</div>
+                <div>
+                    <h4 class="font-bold text-sm">${title}</h4>
+                    <p class="text-xs text-zinc-400 mt-0.5">${message}</p>
+                </div>
+            `;
+            
+            document.getElementById('toast-container').appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-leave');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // 5. TRANSIÇÃO DA CORTINA
+        function startRevealTransition() {
+            // Fecha as cortinas
+            curtainWrapper.classList.add('curtain-closed');
+            
+            setTimeout(() => {
+                // Oculta o quiz e mostra a revelação por baixo
+                quizContainer.classList.add('hidden');
+                revelationContainer.classList.remove('hidden');
+                revelationContainer.classList.add('flex');
+                
+                // Abre as cortinas
+                setTimeout(() => {
+                    curtainWrapper.classList.remove('curtain-closed');
+                }, 500);
+            }, 1500);
+        }
+
+        // Service Worker Script
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+
+        // Inicia o Quiz
+        renderQuestion();
     </script>
 </body>
 </html>
