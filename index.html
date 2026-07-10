@@ -12,17 +12,21 @@
     
     <style>
         * { -webkit-tap-highlight-color: transparent; }
-
-        /* Fontes e Símbolos */
+        
+        /* Fontes */
         .supernatural-title { font-family: 'Cinzel', serif; letter-spacing: 0.3em; text-shadow: 0 0 15px rgba(185, 28, 28, 0.6), 0 0 5px rgba(185, 28, 28, 0.8); }
         .romantic-text { font-family: 'Dancing Script', cursive; }
+        
+        /* Simbolos Background Quiz */
         .symbol-fade-in { animation: fadeInSymbol 1s ease-in-out forwards; }
         @keyframes fadeInSymbol { from { opacity: 0; transform: scale(0.9); } to { opacity: 0.12; transform: scale(1); } }
 
-        /* Cortinas e Holofotes */
-        .curtain-panel { transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; background: repeating-linear-gradient(90deg, #7f1d1d 0%, #450a0a 5%, #7f1d1d 10%); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 60; }
+        /* Cortinas (Z-index alto para cobrir a tela toda) */
+        .curtain-panel { transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; background: repeating-linear-gradient(90deg, #7f1d1d 0%, #450a0a 5%, #7f1d1d 10%); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 100; }
         .curtain-closed .curtain-panel { width: 50%; }
-        #spotlights-container { opacity: 0; transition: opacity 0.5s ease; z-index: 70; }
+        
+        /* Holofotes */
+        #spotlights-container { opacity: 0; transition: opacity 0.5s ease; z-index: 110; }
         .spotlights-active { opacity: 1 !important; }
         .spotlight-circle { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%); mix-blend-mode: overlay; filter: blur(4px); pointer-events: none; }
         .spot-1 { animation: roam1 3s infinite alternate ease-in-out; } .spot-2 { animation: roam2 2.5s infinite alternate ease-in-out; } .spot-3 { animation: roam3 3.5s infinite alternate ease-in-out; }
@@ -35,93 +39,105 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
-        /* === ANIMAÇÕES DA REVELAÇÃO === */
+        /* === TELA DE REVELAÇÃO (MAGIA PURA) === */
+        #revelation-container { position: fixed; inset: 0; background-color: #09090b; z-index: 50; overflow: hidden; display: none; }
+        .show-revelation { display: flex !important; }
+
+        /* 1. Corda (Travada no eixo X central) */
+        .pull-cord-wrapper { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; items-center; align-items: center; cursor: pointer; z-index: 90; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .cord-line { width: 4px; height: 120px; background: linear-gradient(to bottom, #52525b, #27272a); }
+        .cord-ring { width: 40px; height: 40px; border: 4px solid #52525b; border-radius: 50%; background: #18181b; display: flex; align-items: center; justify-content: center; margin-top: -5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+        .cord-pulled { transform: translate(-50%, -150%); }
+
+        /* 2. Coração Neon (Traçado Matemático) */
+        .heart-svg { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; overflow: visible; z-index: 70; opacity: 0; transition: opacity 0.5s; }
+        .heart-path { fill: transparent; stroke: #f43f5e; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 10px #e11d48) drop-shadow(0 0 20px #be123c); stroke-dasharray: 100; stroke-dashoffset: 100; }
         
-        /* 1. Corda */
-        .cord-container { transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cord-pulled { transform: translateY(-150%); }
-
-        /* 2. Coração Animado e Brilhante */
-        .heart-path {
-            stroke-dasharray: 100;
-            stroke-dashoffset: 100;
-            pathLength: 100; /* Força o cálculo perfeito da linha */
-        }
-        .neon-active .heart-path {
-            animation: drawHeart 2s ease-out forwards, pulseGlow 2s 2s infinite alternate;
-        }
+        .magic-active .heart-svg { opacity: 1; }
+        .magic-active .heart-path { animation: drawHeart 2s ease-out forwards, pulseHeart 1.5s infinite alternate 2s; }
         @keyframes drawHeart { to { stroke-dashoffset: 0; } }
-        @keyframes pulseGlow {
-            0% { filter: drop-shadow(0 0 10px #e11d48); transform: scale(1); }
-            100% { filter: drop-shadow(0 0 30px #be123c) drop-shadow(0 0 50px #f43f5e); transform: scale(1.03); }
-        }
+        @keyframes pulseHeart { 0% { filter: drop-shadow(0 0 10px #e11d48) drop-shadow(0 0 20px #be123c); } 100% { filter: drop-shadow(0 0 20px #f43f5e) drop-shadow(0 0 40px #f43f5e); stroke: #fb7185; } }
 
-        /* Feixes de Luz Atrás do Coração */
-        .beam { position: absolute; width: 2px; height: 40px; background: linear-gradient(to top, rgba(244, 63, 94, 0), rgba(244, 63, 94, 0.8)); transform-origin: bottom center; animation: shootBeam 1.5s infinite ease-out; opacity: 0; }
-        @keyframes shootBeam { 0% { transform: translateY(0) scaleY(0.5); opacity: 1; } 100% { transform: translateY(-100px) scaleY(1.5); opacity: 0; } }
+        /* 3. Buquê de Flores (CSS ART REAL) */
+        .bouquet { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 300px; height: 250px; z-index: 75; pointer-events: none; }
+        
+        .flower { position: absolute; bottom: -20px; display: flex; flex-direction: column; align-items: center; transform-origin: bottom center; }
+        .f1 { left: 15%; rotate: -25deg; }
+        .f2 { left: 50%; transform: translateX(-50%); z-index: 2; }
+        .f3 { right: 15%; rotate: 25deg; }
 
-        /* 3. Buquê Elegante (SVG Animation) */
-        .stem-path {
-            stroke-dasharray: 100;
-            stroke-dashoffset: 100;
-            pathLength: 100;
-            transition: stroke-dashoffset 1.5s ease-in-out;
-        }
-        .flower-bud {
-            transform: scale(0);
-            opacity: 0;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        /* Quando ativadas, as plantas crescem */
-        .bloom-active .stem-path { stroke-dashoffset: 0; }
-        .bloom-active .flower-bud { transform: scale(1); opacity: 1; }
+        /* Caule crescendo */
+        .stem { width: 6px; height: 0px; background: linear-gradient(to right, #166534, #22c55e); border-radius: 4px; transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .f1 .stem { transition-delay: 0.5s; }
+        .f2 .stem { transition-delay: 0.8s; }
+        .f3 .stem { transition-delay: 1.1s; }
+        
+        .magic-active .f1 .stem { height: 160px; }
+        .magic-active .f2 .stem { height: 220px; }
+        .magic-active .f3 .stem { height: 150px; }
 
-        /* 4. Envelope Centralizado */
-        #envelope-container {
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        /* Pétalas Desabrochando */
+        .petals { position: absolute; top: 0; transform: translateY(-50%) scale(0); display: flex; justify-content: center; align-items: center; transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .f1 .petals { transition-delay: 1.8s; }
+        .f2 .petals { transition-delay: 2.1s; }
+        .f3 .petals { transition-delay: 2.4s; }
+        
+        .magic-active .petals { transform: translateY(-50%) scale(1); }
+
+        .petal-part { position: absolute; width: 30px; height: 30px; background: #ec4899; border-radius: 50% 50% 0 50%; transform-origin: bottom right; }
+        .p1 { transform: rotate(0deg); } .p2 { transform: rotate(72deg); } .p3 { transform: rotate(144deg); } .p4 { transform: rotate(216deg); } .p5 { transform: rotate(288deg); }
+        .center-dot { position: absolute; width: 20px; height: 20px; background: #fbbf24; border-radius: 50%; z-index: 5; box-shadow: inset 0 0 5px #b45309; }
+
+        /* Variação de cores das flores */
+        .f1 .petal-part { background: #c084fc; } /* Roxa */
+        .f2 .petal-part { background: #f43f5e; } /* Vermelha */
+        .f3 .petal-part { background: #38bdf8; } /* Azul */
+
+        /* 4. Envelope (Na frente de tudo) */
+        .envelope-outer { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%) scale(0); opacity: 0; z-index: 85; transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transition-delay: 3.5s; display: flex; flex-direction: column; align-items: center; }
+        .magic-active .envelope-outer { transform: translateX(-50%) scale(1); opacity: 1; }
+
         .envelope-wrapper { width: 140px; height: 90px; position: relative; perspective: 800px; cursor: pointer; animation: floatEnvelope 3s infinite ease-in-out; }
         @keyframes floatEnvelope { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         
-        .envelope-back { position: absolute; inset: 0; background: #be123c; border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .envelope-letter { position: absolute; left: 5px; right: 5px; bottom: 5px; height: 80px; background: #fff1f2; border-radius: 4px; transition: transform 0.8s ease; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .envelope-letter-content { font-size: 12px; color: #881337; text-align: center; width: 100%; margin-top: -15px; opacity: 0; transition: opacity 0.3s; }
+        .env-back { position: absolute; inset: 0; background: #be123c; border-radius: 4px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        .env-letter { position: absolute; left: 6px; right: 6px; bottom: 6px; height: 75px; background: #fff1f2; border-radius: 4px; transition: transform 0.8s ease; z-index: 2; display: flex; justify-content: center; padding-top: 15px; }
+        .env-letter p { font-size: 11px; font-weight: bold; color: #881337; opacity: 0; transition: opacity 0.3s; }
         
-        .envelope-front-left { position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: #e11d48; clip-path: polygon(0 0, 100% 50%, 0 100%); z-index: 3; }
-        .envelope-front-right { position: absolute; top: 0; bottom: 0; right: 0; width: 50%; background: #e11d48; clip-path: polygon(100% 0, 0 50%, 100% 100%); z-index: 3; }
-        .envelope-front-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: #f43f5e; clip-path: polygon(0 100%, 50% 0, 100% 100%); z-index: 4; }
-        .envelope-flap { position: absolute; top: 0; left: 0; right: 0; height: 60%; background: #9f1239; clip-path: polygon(0 0, 50% 100%, 100% 0); transform-origin: top; transition: transform 0.6s ease; z-index: 5; }
-        
-        /* Ação de abrir */
-        .is-open .envelope-flap { transform: rotateX(180deg); z-index: 1; }
-        .is-open .envelope-letter { transform: translateY(-50px); }
-        .is-open .envelope-letter-content { opacity: 1; }
+        .env-front-left { position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: #e11d48; clip-path: polygon(0 0, 100% 50%, 0 100%); z-index: 3; }
+        .env-front-right { position: absolute; top: 0; bottom: 0; right: 0; width: 50%; background: #e11d48; clip-path: polygon(100% 0, 0 50%, 100% 100%); z-index: 3; }
+        .env-front-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: #f43f5e; clip-path: polygon(0 100%, 50% 0, 100% 100%); z-index: 4; }
+        .env-flap { position: absolute; top: 0; left: 0; right: 0; height: 60%; background: #9f1239; clip-path: polygon(0 0, 50% 100%, 100% 0); transform-origin: top; transition: transform 0.6s ease; z-index: 5; }
 
-        /* 5. Carta Gigante Final */
+        /* Estados do Envelope Aberto */
+        .envelope-open .env-flap { transform: rotateX(180deg); z-index: 1; }
+        .envelope-open .env-letter { transform: translateY(-45px); }
+        .envelope-open .env-letter p { opacity: 1; }
+
+        /* 5. A Carta Gigante (Declaração) */
         #final-letter-modal { transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-red-900 selection:text-white overflow-hidden">
+<body class="bg-zinc-950 text-zinc-100 font-sans selection:bg-red-900 selection:text-white">
 
     <audio id="bg-music" loop>
         <source src="musica.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- O DISFARCE (QUIZ) -->
-    <div id="quiz-container" class="flex flex-col min-h-screen w-full transition-opacity duration-1000 relative overflow-y-auto">
-        <header class="w-full p-4 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md fixed top-0 z-20 flex flex-col items-center justify-center">
+    <div id="quiz-container" class="flex flex-col min-h-screen w-full relative pb-10 transition-opacity duration-1000">
+        <header class="w-full p-4 border-b border-zinc-900 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-20 flex flex-col items-center justify-center">
             <span class="text-[9px] text-zinc-600 uppercase tracking-[0.2em] font-bold">FATEC - Análise e Desenvolvimento de Sistemas</span>
             <h1 class="text-sm font-semibold text-zinc-400 mt-1">Trabalho de Férias <span class="text-red-800">|</span> Frontend</h1>
         </header>
 
-        <main class="flex-1 w-full max-w-md mx-auto mt-20 p-5 flex flex-col mb-4 z-10">
-            <div class="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-2xl p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] relative overflow-hidden flex-1 flex flex-col">
+        <main class="w-full max-w-md mx-auto mt-10 p-5 flex flex-col z-10">
+            <div class="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800/80 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col">
                 <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-800 to-transparent"></div>
-                <div class="text-center mb-8 mt-2">
+                <div class="text-center mb-6 mt-2">
                     <h2 class="supernatural-title text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-800 uppercase">Supernatural</h2>
                 </div>
                 <h2 id="question-text" class="text-[1.1rem] font-medium leading-relaxed mb-6 text-center text-zinc-200 min-h-[4rem] transition-opacity duration-300">Carregando pergunta...</h2>
-                <div id="symbol-container" class="flex-1 flex items-center justify-center py-4 text-red-700 pointer-events-none"></div>
+                <div id="symbol-container" class="w-full flex items-center justify-center py-4 text-red-700 pointer-events-none"></div>
                 <div id="options-container" class="flex flex-col gap-3 mt-4"></div>
             </div>
             <div class="mt-6 text-center">
@@ -132,7 +148,6 @@
         </main>
     </div>
 
-    <!-- CORTINAS TEATRAIS E HOLOFOTES -->
     <div id="curtain-wrapper" class="fixed inset-0 z-50 pointer-events-none flex overflow-hidden">
         <div id="curtain-left" class="curtain-panel h-full border-r-4 border-red-950/80"></div>
         <div id="curtain-right" class="curtain-panel h-full border-l-4 border-red-950/80 ml-auto"></div>
@@ -143,71 +158,49 @@
         </div>
     </div>
 
-    <!-- A REVELAÇÃO -->
-    <div id="revelation-container" class="hidden min-h-screen w-full bg-zinc-950 relative fixed inset-0 z-40">
+    <div id="revelation-container">
         
-        <!-- 1. CORDA PARA PUXAR (CENTRALIZADA ABSOLUTA) -->
-        <div id="pull-cord" class="cord-container absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer z-50" onclick="triggerMagic()">
-            <div class="w-1.5 h-32 bg-gradient-to-b from-zinc-800 to-zinc-500 rounded-b"></div>
-            <div class="w-10 h-10 border-4 border-zinc-500 rounded-full flex items-center justify-center bg-zinc-800 shadow-[0_10px_20px_rgba(0,0,0,0.5)] -mt-2">
-                <div class="w-4 h-4 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
-            </div>
+        <div id="pull-cord" class="pull-cord-wrapper" onclick="triggerMagic()">
+            <div class="cord-line"></div>
+            <div class="cord-ring"><div class="w-4 h-4 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div></div>
             <span class="text-zinc-400 text-xs mt-3 font-mono uppercase tracking-widest bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-800 animate-bounce">Puxe</span>
         </div>
 
-        <!-- 2. CORAÇÃO NEON DESENHADO -->
-        <!-- Usado SVG padrão 24x24 escalado, garantindo simetria perfeita -->
-        <div id="neon-background" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-opacity duration-1000 z-10 pb-32">
-            <div id="beams-container" class="absolute inset-0 flex items-center justify-center mt-10"></div>
-            <svg class="w-56 h-56 text-rose-500 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.3" stroke-linecap="round" stroke-linejoin="round">
-                <path class="heart-path transform-origin-center" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-        </div>
+        <svg class="heart-svg" viewBox="0 0 24 24">
+            <path class="heart-path" pathLength="100" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
 
-        <!-- 3. BUQUÊ ELEGANTE SVG (CAULES CRESCEM) -->
-        <div id="bouquet-container" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md h-64 pointer-events-none z-20 flex justify-center pb-5">
-            <svg viewBox="0 0 200 150" class="w-full h-full overflow-visible">
-                <!-- Caules (crescem com delay diferente) -->
-                <path class="stem-path" style="transition-delay: 0s" d="M100 150 Q70 110 30 60" fill="none" stroke="#22c55e" stroke-width="2"/>
-                <path class="stem-path" style="transition-delay: 0.2s" d="M100 150 Q85 100 65 40" fill="none" stroke="#16a34a" stroke-width="2.5"/>
-                <path class="stem-path" style="transition-delay: 0.4s" d="M100 150 Q100 100 100 30" fill="none" stroke="#15803d" stroke-width="3"/>
-                <path class="stem-path" style="transition-delay: 0.6s" d="M100 150 Q115 100 135 40" fill="none" stroke="#16a34a" stroke-width="2.5"/>
-                <path class="stem-path" style="transition-delay: 0.8s" d="M100 150 Q130 110 170 60" fill="none" stroke="#22c55e" stroke-width="2"/>
-
-                <!-- Botões das Flores (Tulipas Minimalistas) -->
-                <g class="flower-bud" style="transition-delay: 1.2s; transform-origin: 30px 60px;" transform="translate(30, 60)">
-                    <path d="M0,0 C-10,-15 -5,-25 0,-30 C5,-25 10,-15 0,0" fill="#f472b6"/>
-                </g>
-                <g class="flower-bud" style="transition-delay: 1.4s; transform-origin: 65px 40px;" transform="translate(65, 40)">
-                    <path d="M0,0 C-12,-18 -6,-30 0,-35 C6,-30 12,-18 0,0" fill="#c084fc"/>
-                </g>
-                <g class="flower-bud" style="transition-delay: 1.6s; transform-origin: 100px 30px;" transform="translate(100, 30)">
-                    <path d="M0,0 C-15,-20 -8,-35 0,-40 C8,-35 15,-20 0,0" fill="#fb7185"/>
-                </g>
-                <g class="flower-bud" style="transition-delay: 1.8s; transform-origin: 135px 40px;" transform="translate(135, 40)">
-                    <path d="M0,0 C-12,-18 -6,-30 0,-35 C6,-30 12,-18 0,0" fill="#facc15"/>
-                </g>
-                <g class="flower-bud" style="transition-delay: 2.0s; transform-origin: 170px 60px;" transform="translate(170, 60)">
-                    <path d="M0,0 C-10,-15 -5,-25 0,-30 C5,-25 10,-15 0,0" fill="#38bdf8"/>
-                </g>
-            </svg>
-        </div>
-
-        <!-- 4. ENVELOPE COM TEXTO EM CIMA (BEM POSICIONADO) -->
-        <div id="envelope-container" class="absolute bottom-[15%] left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto opacity-0 scale-0 z-30">
-            <span class="text-white font-bold mb-3 animate-bounce bg-rose-600 px-4 py-1 rounded-full text-xs shadow-[0_0_15px_rgba(225,29,72,0.8)] border border-rose-400">Aperte</span>
-            <div id="the-envelope" class="envelope-wrapper" onclick="openEnvelope()">
-                <div class="envelope-back"></div>
-                <div class="envelope-letter"><p class="envelope-letter-content font-bold">Para você ❤️</p></div>
-                <div class="envelope-front-left"></div>
-                <div class="envelope-front-right"></div>
-                <div class="envelope-front-bottom"></div>
-                <div class="envelope-flap"></div>
+        <div class="bouquet">
+            <div class="flower f1">
+                <div class="stem">
+                    <div class="petals"><div class="petal-part p1"></div><div class="petal-part p2"></div><div class="petal-part p3"></div><div class="petal-part p4"></div><div class="petal-part p5"></div><div class="center-dot"></div></div>
+                </div>
+            </div>
+            <div class="flower f3">
+                <div class="stem">
+                    <div class="petals"><div class="petal-part p1"></div><div class="petal-part p2"></div><div class="petal-part p3"></div><div class="petal-part p4"></div><div class="petal-part p5"></div><div class="center-dot"></div></div>
+                </div>
+            </div>
+            <div class="flower f2">
+                <div class="stem">
+                    <div class="petals"><div class="petal-part p1"></div><div class="petal-part p2"></div><div class="petal-part p3"></div><div class="petal-part p4"></div><div class="petal-part p5"></div><div class="center-dot"></div></div>
+                </div>
             </div>
         </div>
 
-        <!-- 5. A CARTA GIGANTE (FINAL) -->
-        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.4)] p-8 sm:p-10 z-50 flex-col items-center justify-center opacity-0 scale-50 pointer-events-none hidden border-2 border-rose-200">
+        <div class="envelope-outer" id="the-envelope-container">
+            <span class="text-white font-bold mb-3 animate-bounce bg-rose-600 px-4 py-1 rounded-full text-xs shadow-[0_0_15px_rgba(225,29,72,0.8)] border border-rose-400">Aperte</span>
+            <div class="envelope-wrapper" onclick="openEnvelope(this)">
+                <div class="env-back"></div>
+                <div class="env-letter"><p>Para você ❤️</p></div>
+                <div class="env-front-left"></div>
+                <div class="env-front-right"></div>
+                <div class="env-front-bottom"></div>
+                <div class="env-flap"></div>
+            </div>
+        </div>
+
+        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.4)] p-8 sm:p-10 z-[120] flex flex-col items-center justify-center opacity-0 scale-50 pointer-events-none hidden border-2 border-rose-200">
             <h1 class="romantic-text text-4xl sm:text-5xl text-rose-600 mb-6 text-center">Surpresa...</h1>
             <p class="text-zinc-700 text-base sm:text-lg leading-relaxed text-center mb-4">
                 A verdade é que esse site nunca foi um trabalho de férias. Eu criei tudo isso do zero só para ter a desculpa perfeita para falar com você de um jeito especial.
@@ -226,7 +219,7 @@
 
     </div>
 
-    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-3 max-w-[90vw]"></div>
+    <div id="toast-container" class="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-[90vw]"></div>
 
     <script>
         // --- QUIZ LOGIC MANTIDA ---
@@ -297,8 +290,12 @@
             }
             setTimeout(() => {
                 currentQuestionIndex++;
-                if (currentQuestionIndex < questions.length) renderQuestion();
-                else startTheatricalReveal();
+                if (currentQuestionIndex < questions.length) {
+                    renderQuestion();
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mantem no topo a cada pergunta
+                } else {
+                    startTheatricalReveal();
+                }
             }, 1800);
         }
 
@@ -311,12 +308,13 @@
         }
 
         function startTheatricalReveal() {
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Trava no topo antes de fechar
             document.getElementById('curtain-wrapper').classList.add('curtain-closed');
             if(musicStarted) bgMusic.volume = 0.1;
             
             setTimeout(() => {
-                document.getElementById('quiz-container').classList.add('hidden');
-                document.getElementById('revelation-container').classList.remove('hidden');
+                document.getElementById('quiz-container').style.display = 'none'; // Esconde quiz
+                document.getElementById('revelation-container').classList.add('show-revelation'); // Mostra a magia
                 
                 document.getElementById('spotlights-container').classList.add('spotlights-active');
                 
@@ -324,65 +322,36 @@
                     document.getElementById('spotlights-container').classList.remove('spotlights-active');
                     setTimeout(() => {
                         document.getElementById('curtain-wrapper').classList.remove('curtain-closed');
-                        createBeams(); // Gera as linhas subindo pro coração
                     }, 800); 
                 }, 4000); 
             }, 2000); 
         }
 
-        function createBeams() {
-            const container = document.getElementById('beams-container');
-            for(let i = 0; i < 12; i++) {
-                const beam = document.createElement('div');
-                beam.className = 'beam';
-                beam.style.transform = `rotate(${i * 30}deg)`;
-                beam.style.animationDelay = `${Math.random() * 1.5}s`;
-                container.appendChild(beam);
-            }
-        }
-
         // --- A GRANDE MÁGICA ---
         function triggerMagic() {
-            // Puxa a corda pra fora da tela
+            // Puxa a corda
             document.getElementById('pull-cord').classList.add('cord-pulled');
             
-            // Acende o Coração e os feixes
-            const neonBg = document.getElementById('neon-background');
-            neonBg.style.opacity = '1';
-            neonBg.classList.add('neon-active'); // Inicia a animação de desenhar a linha do coração
+            // Ativa o container (desenha o coração e cresce as flores)
+            document.getElementById('revelation-container').classList.add('magic-active');
             
             if(musicStarted) bgMusic.volume = 0.5;
-
-            // Inicia o crescimento do buquê Elegante (Caules e Flores em SVG)
-            setTimeout(() => {
-                document.getElementById('bouquet-container').classList.add('bloom-active');
-                
-                // Exibe a carta (com opacidade e scale subindo) perfeitamente centralizada
-                setTimeout(() => {
-                    const envelopeContainer = document.getElementById('envelope-container');
-                    envelopeContainer.classList.remove('opacity-0', 'scale-0');
-                    envelopeContainer.classList.add('opacity-100', 'scale-100');
-                }, 2800); // Exato tempo de esperar os caules crescerem e as tulipas brotarem
-
-            }, 800);
         }
 
-        function openEnvelope() {
-            const envelope = document.getElementById('the-envelope');
-            if(envelope.classList.contains('is-open')) return;
+        function openEnvelope(el) {
+            if(el.classList.contains('envelope-open')) return;
             
-            // Anima aba do envelope
-            envelope.classList.add('is-open');
+            // Anima aba abrindo
+            el.classList.add('envelope-open');
             
             // Vai pra tela final romântica
             setTimeout(() => {
-                document.getElementById('bouquet-container').style.opacity = '0';
-                document.getElementById('neon-background').style.opacity = '0';
-                document.getElementById('envelope-container').style.opacity = '0';
+                // Esconde fundo
+                const revContainer = document.getElementById('revelation-container');
+                revContainer.querySelectorAll('.heart-svg, .bouquet, .envelope-outer').forEach(e => e.style.opacity = '0');
                 
                 const finalModal = document.getElementById('final-letter-modal');
                 finalModal.classList.remove('hidden');
-                finalModal.classList.add('flex');
                 
                 setTimeout(() => {
                     finalModal.classList.remove('opacity-0', 'scale-50');
