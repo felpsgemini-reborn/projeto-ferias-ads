@@ -21,7 +21,7 @@
         .symbol-fade-in { animation: fadeInSymbol 1s ease-in-out forwards; }
         @keyframes fadeInSymbol { from { opacity: 0; transform: scale(0.9); } to { opacity: 0.12; transform: scale(1); } }
 
-        /* Cortinas (Z-index alto para cobrir a tela toda) */
+        /* Cortinas */
         .curtain-panel { transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; background: repeating-linear-gradient(90deg, #7f1d1d 0%, #450a0a 5%, #7f1d1d 10%); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 100; }
         .curtain-closed .curtain-panel { width: 50%; }
         
@@ -39,62 +39,29 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
-        /* === TELA DE REVELAÇÃO (MAGIA PURA) === */
+        /* === TELA DE REVELAÇÃO (FLORES AMARILLAS) === */
         #revelation-container { position: fixed; inset: 0; background-color: #09090b; z-index: 50; overflow: hidden; display: none; }
         .show-revelation { display: flex !important; }
 
-        /* 1. Corda (Travada no eixo X central) */
+        /* Corda */
         .pull-cord-wrapper { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; items-center; align-items: center; cursor: pointer; z-index: 90; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .cord-line { width: 4px; height: 120px; background: linear-gradient(to bottom, #52525b, #27272a); }
         .cord-ring { width: 40px; height: 40px; border: 4px solid #52525b; border-radius: 50%; background: #18181b; display: flex; align-items: center; justify-content: center; margin-top: -5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
         .cord-pulled { transform: translate(-50%, -150%); }
 
-        /* 2. Coração Neon (Traçado Matemático) */
-        .heart-svg { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; overflow: visible; z-index: 70; opacity: 0; transition: opacity 0.5s; }
-        .heart-path { fill: transparent; stroke: #f43f5e; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 10px #e11d48) drop-shadow(0 0 20px #be123c); stroke-dasharray: 100; stroke-dashoffset: 100; }
+        /* Flores (SVG) */
+        .stem { stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 2s ease-in-out; }
+        .flower-head { transform: scale(0) rotate(-45deg); opacity: 0; transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
-        .magic-active .heart-svg { opacity: 1; }
-        .magic-active .heart-path { animation: drawHeart 2s ease-out forwards, pulseHeart 1.5s infinite alternate 2s; }
-        @keyframes drawHeart { to { stroke-dashoffset: 0; } }
-        @keyframes pulseHeart { 0% { filter: drop-shadow(0 0 10px #e11d48) drop-shadow(0 0 20px #be123c); } 100% { filter: drop-shadow(0 0 20px #f43f5e) drop-shadow(0 0 40px #f43f5e); stroke: #fb7185; } }
+        .magic-active .stem { stroke-dashoffset: 0; }
+        .magic-active .flower-head { transform: scale(1) rotate(0deg); opacity: 1; }
 
-        /* 3. Buquê de Flores (CSS ART REAL) */
-        .bouquet { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 300px; height: 250px; z-index: 75; pointer-events: none; }
-        
-        .flower { position: absolute; bottom: -20px; display: flex; flex-direction: column; align-items: center; transform-origin: bottom center; }
-        .f1 { left: 15%; rotate: -25deg; }
-        .f2 { left: 50%; transform: translateX(-50%); z-index: 2; }
-        .f3 { right: 15%; rotate: 25deg; }
+        /* Partículas Brilhantes */
+        .sparkle { position: absolute; background: #facc15; border-radius: 50%; box-shadow: 0 0 10px #facc15; animation: floatUp linear infinite; opacity: 0; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100vh); opacity: 0; } }
 
-        /* Caule crescendo */
-        .stem { width: 6px; height: 0px; background: linear-gradient(to right, #166534, #22c55e); border-radius: 4px; transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-        .f1 .stem { transition-delay: 0.5s; }
-        .f2 .stem { transition-delay: 0.8s; }
-        .f3 .stem { transition-delay: 1.1s; }
-        
-        .magic-active .f1 .stem { height: 160px; }
-        .magic-active .f2 .stem { height: 220px; }
-        .magic-active .f3 .stem { height: 150px; }
-
-        /* Pétalas Desabrochando */
-        .petals { position: absolute; top: 0; transform: translateY(-50%) scale(0); display: flex; justify-content: center; align-items: center; transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .f1 .petals { transition-delay: 1.8s; }
-        .f2 .petals { transition-delay: 2.1s; }
-        .f3 .petals { transition-delay: 2.4s; }
-        
-        .magic-active .petals { transform: translateY(-50%) scale(1); }
-
-        .petal-part { position: absolute; width: 30px; height: 30px; background: #ec4899; border-radius: 50% 50% 0 50%; transform-origin: bottom right; }
-        .p1 { transform: rotate(0deg); } .p2 { transform: rotate(72deg); } .p3 { transform: rotate(144deg); } .p4 { transform: rotate(216deg); } .p5 { transform: rotate(288deg); }
-        .center-dot { position: absolute; width: 20px; height: 20px; background: #fbbf24; border-radius: 50%; z-index: 5; box-shadow: inset 0 0 5px #b45309; }
-
-        /* Variação de cores das flores */
-        .f1 .petal-part { background: #c084fc; } /* Roxa */
-        .f2 .petal-part { background: #f43f5e; } /* Vermelha */
-        .f3 .petal-part { background: #38bdf8; } /* Azul */
-
-        /* 4. Envelope (Na frente de tudo) */
-        .envelope-outer { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%) scale(0); opacity: 0; z-index: 85; transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transition-delay: 3.5s; display: flex; flex-direction: column; align-items: center; }
+        /* Envelope */
+        .envelope-outer { position: absolute; bottom: 15vh; left: 50%; transform: translateX(-50%) scale(0); opacity: 0; z-index: 85; transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transition-delay: 3.5s; display: flex; flex-direction: column; align-items: center; }
         .magic-active .envelope-outer { transform: translateX(-50%) scale(1); opacity: 1; }
 
         .envelope-wrapper { width: 140px; height: 90px; position: relative; perspective: 800px; cursor: pointer; animation: floatEnvelope 3s infinite ease-in-out; }
@@ -109,12 +76,12 @@
         .env-front-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: #f43f5e; clip-path: polygon(0 100%, 50% 0, 100% 100%); z-index: 4; }
         .env-flap { position: absolute; top: 0; left: 0; right: 0; height: 60%; background: #9f1239; clip-path: polygon(0 0, 50% 100%, 100% 0); transform-origin: top; transition: transform 0.6s ease; z-index: 5; }
 
-        /* Estados do Envelope Aberto */
+        /* Abertura do Envelope */
         .envelope-open .env-flap { transform: rotateX(180deg); z-index: 1; }
         .envelope-open .env-letter { transform: translateY(-45px); }
         .envelope-open .env-letter p { opacity: 1; }
 
-        /* 5. A Carta Gigante (Declaração) */
+        /* Carta Final */
         #final-letter-modal { transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
@@ -160,32 +127,51 @@
 
     <div id="revelation-container">
         
+        <div id="sparkles-container" class="absolute inset-0 pointer-events-none z-10 overflow-hidden transition-opacity duration-1000"></div>
+
         <div id="pull-cord" class="pull-cord-wrapper" onclick="triggerMagic()">
             <div class="cord-line"></div>
             <div class="cord-ring"><div class="w-4 h-4 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div></div>
             <span class="text-zinc-400 text-xs mt-3 font-mono uppercase tracking-widest bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-800 animate-bounce">Puxe</span>
         </div>
 
-        <svg class="heart-svg" viewBox="0 0 24 24">
-            <path class="heart-path" pathLength="100" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-[75vh] pointer-events-none z-20 flex justify-center items-end pb-5">
+            <svg id="bouquet-svg" viewBox="0 0 400 500" class="w-full h-full overflow-visible transition-opacity duration-1000">
+                <defs id="flower-defs"></defs> <path class="stem" style="transition-delay: 0.1s" pathLength="100" d="M200,500 Q200,300 200,100" fill="none" stroke="#16a34a" stroke-width="6" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 0.2s" pathLength="100" d="M200,500 Q150,300 120,150" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 0.3s" pathLength="100" d="M200,500 Q250,300 280,150" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round"/>
+                
+                <path class="stem" style="transition-delay: 0.4s" pathLength="100" d="M200,500 Q100,350 60,240" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 0.5s" pathLength="100" d="M200,500 Q300,350 340,240" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 0.6s" pathLength="100" d="M200,500 Q170,350 140,270" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 0.7s" pathLength="100" d="M200,500 Q230,350 260,270" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 0.8s" pathLength="100" d="M200,500 Q200,350 200,220" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round"/>
+                
+                <path class="stem" style="transition-delay: 0.9s" pathLength="100" d="M200,500 Q120,400 90,350" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 1.0s" pathLength="100" d="M200,500 Q280,400 310,350" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 1.1s" pathLength="100" d="M200,500 Q200,400 200,330" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+                
+                <path class="stem" style="transition-delay: 1.2s" pathLength="100" d="M200,500 Q100,400 40,180" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 1.3s" pathLength="100" d="M200,500 Q300,400 360,180" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 1.4s" pathLength="100" d="M200,500 Q150,300 130,90" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+                <path class="stem" style="transition-delay: 1.5s" pathLength="100" d="M200,500 Q250,300 270,90" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round"/>
 
-        <div class="bouquet">
-            <div class="flower f1">
-                <div class="stem">
-                    <div class="petals"><div class="petal-part p1"></div><div class="petal-part p2"></div><div class="petal-part p3"></div><div class="petal-part p4"></div><div class="petal-part p5"></div><div class="center-dot"></div></div>
-                </div>
-            </div>
-            <div class="flower f3">
-                <div class="stem">
-                    <div class="petals"><div class="petal-part p1"></div><div class="petal-part p2"></div><div class="petal-part p3"></div><div class="petal-part p4"></div><div class="petal-part p5"></div><div class="center-dot"></div></div>
-                </div>
-            </div>
-            <div class="flower f2">
-                <div class="stem">
-                    <div class="petals"><div class="petal-part p1"></div><div class="petal-part p2"></div><div class="petal-part p3"></div><div class="petal-part p4"></div><div class="petal-part p5"></div><div class="center-dot"></div></div>
-                </div>
-            </div>
+                <g transform="translate(200, 100)"><g class="flower-head" style="transition-delay: 1.5s;"><use href="#yellow-flower" transform="scale(1.3)"/></g></g>
+                <g transform="translate(120, 150)"><g class="flower-head" style="transition-delay: 1.6s;"><use href="#yellow-flower" transform="scale(1.1)"/></g></g>
+                <g transform="translate(280, 150)"><g class="flower-head" style="transition-delay: 1.7s;"><use href="#yellow-flower" transform="scale(1.1)"/></g></g>
+                <g transform="translate(60, 240)"><g class="flower-head" style="transition-delay: 1.8s;"><use href="#yellow-flower" transform="scale(0.9)"/></g></g>
+                <g transform="translate(340, 240)"><g class="flower-head" style="transition-delay: 1.9s;"><use href="#yellow-flower" transform="scale(0.9)"/></g></g>
+                <g transform="translate(140, 270)"><g class="flower-head" style="transition-delay: 2.0s;"><use href="#yellow-flower" transform="scale(1.0)"/></g></g>
+                <g transform="translate(260, 270)"><g class="flower-head" style="transition-delay: 2.1s;"><use href="#yellow-flower" transform="scale(1.0)"/></g></g>
+                <g transform="translate(200, 220)"><g class="flower-head" style="transition-delay: 2.2s;"><use href="#yellow-flower" transform="scale(1.2)"/></g></g>
+                <g transform="translate(90, 350)"><g class="flower-head" style="transition-delay: 2.3s;"><use href="#yellow-flower" transform="scale(0.8)"/></g></g>
+                <g transform="translate(310, 350)"><g class="flower-head" style="transition-delay: 2.4s;"><use href="#yellow-flower" transform="scale(0.8)"/></g></g>
+                <g transform="translate(200, 330)"><g class="flower-head" style="transition-delay: 2.5s;"><use href="#yellow-flower" transform="scale(1.0)"/></g></g>
+                <g transform="translate(40, 180)"><g class="flower-head" style="transition-delay: 2.6s;"><use href="#yellow-flower" transform="scale(0.8)"/></g></g>
+                <g transform="translate(360, 180)"><g class="flower-head" style="transition-delay: 2.7s;"><use href="#yellow-flower" transform="scale(0.8)"/></g></g>
+                <g transform="translate(130, 90)"><g class="flower-head" style="transition-delay: 2.8s;"><use href="#yellow-flower" transform="scale(1.0)"/></g></g>
+                <g transform="translate(270, 90)"><g class="flower-head" style="transition-delay: 2.9s;"><use href="#yellow-flower" transform="scale(1.0)"/></g></g>
+            </svg>
         </div>
 
         <div class="envelope-outer" id="the-envelope-container">
@@ -200,8 +186,8 @@
             </div>
         </div>
 
-        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.4)] p-8 sm:p-10 z-[120] flex flex-col items-center justify-center opacity-0 scale-50 pointer-events-none hidden border-2 border-rose-200">
-            <h1 class="romantic-text text-4xl sm:text-5xl text-rose-600 mb-6 text-center">Surpresa...</h1>
+        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-amber-50/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(250,204,21,0.3)] p-8 sm:p-10 z-[120] flex flex-col items-center justify-center opacity-0 scale-50 pointer-events-none hidden border-2 border-yellow-200">
+            <h1 class="romantic-text text-4xl sm:text-5xl text-amber-600 mb-6 text-center">Surpresa...</h1>
             <p class="text-zinc-700 text-base sm:text-lg leading-relaxed text-center mb-4">
                 A verdade é que esse site nunca foi um trabalho de férias. Eu criei tudo isso do zero só para ter a desculpa perfeita para falar com você de um jeito especial.
             </p>
@@ -210,11 +196,11 @@
             </p>
             
             <div class="flex gap-4 mt-auto">
-                <button class="px-6 py-3 bg-rose-500 text-white rounded-full font-bold shadow-lg hover:bg-rose-600 active:scale-95 transition-all">Eu Amei!</button>
+                <button class="px-6 py-3 bg-amber-500 text-white rounded-full font-bold shadow-lg hover:bg-amber-600 active:scale-95 transition-all">Eu Amei!</button>
             </div>
             
-            <div class="absolute top-4 left-4 text-rose-300 animate-pulse">❤️</div>
-            <div class="absolute bottom-4 right-4 text-rose-300 animate-pulse">❤️</div>
+            <div class="absolute top-4 left-4 text-amber-400 animate-pulse text-2xl">🌻</div>
+            <div class="absolute bottom-4 right-4 text-amber-400 animate-pulse text-2xl">🌻</div>
         </div>
 
     </div>
@@ -222,7 +208,42 @@
     <div id="toast-container" class="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-[90vw]"></div>
 
     <script>
-        // --- QUIZ LOGIC MANTIDA ---
+        // --- 1. LÓGICA DE GERAÇÃO DAS FLORES AMARELAS (Executa ao carregar a página) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const defs = document.getElementById('flower-defs');
+            if(!defs) return;
+            const ns = "http://www.w3.org/2000/svg";
+            let flowerGroup = document.createElementNS(ns, "g");
+            flowerGroup.setAttribute("id", "yellow-flower");
+            
+            // Camada de trás das pétalas (Douradas)
+            for(let i=0; i<16; i++) {
+                let angle = i * 22.5 + 11.25;
+                let p = document.createElementNS(ns, "ellipse");
+                p.setAttribute("cx", "0"); p.setAttribute("cy", "-25"); p.setAttribute("rx", "11"); p.setAttribute("ry", "35");
+                p.setAttribute("fill", "#eab308"); p.setAttribute("transform", `rotate(${angle})`);
+                flowerGroup.appendChild(p);
+            }
+            // Camada da frente das pétalas (Amarelo vibrante)
+            for(let i=0; i<16; i++) {
+                let angle = i * 22.5;
+                let p = document.createElementNS(ns, "ellipse");
+                p.setAttribute("cx", "0"); p.setAttribute("cy", "-25"); p.setAttribute("rx", "9"); p.setAttribute("ry", "32");
+                p.setAttribute("fill", "#facc15"); p.setAttribute("transform", `rotate(${angle})`);
+                flowerGroup.appendChild(p);
+            }
+            // Miolo do girassol
+            let c1 = document.createElementNS(ns, "circle");
+            c1.setAttribute("cx", "0"); c1.setAttribute("cy", "0"); c1.setAttribute("r", "16"); c1.setAttribute("fill", "#854d0e");
+            let c2 = document.createElementNS(ns, "circle");
+            c2.setAttribute("cx", "0"); c2.setAttribute("cy", "0"); c2.setAttribute("r", "12"); c2.setAttribute("fill", "#422006");
+            
+            flowerGroup.appendChild(c1);
+            flowerGroup.appendChild(c2);
+            defs.appendChild(flowerGroup);
+        });
+
+        // --- 2. LÓGICA DO QUIZ ---
         const questions = [
             { question: "Qual lenda urbana foi o primeiro espírito enfrentado pelos irmãos Winchester?", options: ["O Homem Gancho", "Bloody Mary", "A Mulher de Branco", "Wendigo"], correctAnswer: 2, symbol: "pentagram" },
             { question: "Qual era o principal objetivo do Demônio dos Olhos Amarelos (Azazel)?", options: ["Matar John", "Abrir o Portão do Inferno", "Encontrar o Colt", "Destruir Homens das Letras"], correctAnswer: 1, symbol: "demon_trap" },
@@ -292,7 +313,7 @@
                 currentQuestionIndex++;
                 if (currentQuestionIndex < questions.length) {
                     renderQuestion();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Mantem no topo a cada pergunta
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     startTheatricalReveal();
                 }
@@ -308,14 +329,13 @@
         }
 
         function startTheatricalReveal() {
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Trava no topo antes de fechar
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('curtain-wrapper').classList.add('curtain-closed');
             if(musicStarted) bgMusic.volume = 0.1;
             
             setTimeout(() => {
-                document.getElementById('quiz-container').style.display = 'none'; // Esconde quiz
-                document.getElementById('revelation-container').classList.add('show-revelation'); // Mostra a magia
-                
+                document.getElementById('quiz-container').style.display = 'none';
+                document.getElementById('revelation-container').classList.add('show-revelation');
                 document.getElementById('spotlights-container').classList.add('spotlights-active');
                 
                 setTimeout(() => {
@@ -327,28 +347,38 @@
             }, 2000); 
         }
 
-        // --- A GRANDE MÁGICA ---
+        // --- 3. A GRANDE MÁGICA ---
+        function createSparkles() {
+            const container = document.getElementById('sparkles-container');
+            for(let i=0; i<30; i++) {
+                let sp = document.createElement('div');
+                sp.className = 'sparkle';
+                sp.style.left = Math.random() * 100 + 'vw';
+                sp.style.width = sp.style.height = (Math.random() * 4 + 2) + 'px';
+                sp.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                sp.style.animationDelay = (Math.random() * 2) + 's';
+                container.appendChild(sp);
+            }
+        }
+
         function triggerMagic() {
-            // Puxa a corda
             document.getElementById('pull-cord').classList.add('cord-pulled');
-            
-            // Ativa o container (desenha o coração e cresce as flores)
             document.getElementById('revelation-container').classList.add('magic-active');
+            
+            // Cria o fundo brilhante
+            createSparkles();
             
             if(musicStarted) bgMusic.volume = 0.5;
         }
 
         function openEnvelope(el) {
             if(el.classList.contains('envelope-open')) return;
-            
-            // Anima aba abrindo
             el.classList.add('envelope-open');
             
-            // Vai pra tela final romântica
             setTimeout(() => {
-                // Esconde fundo
-                const revContainer = document.getElementById('revelation-container');
-                revContainer.querySelectorAll('.heart-svg, .bouquet, .envelope-outer').forEach(e => e.style.opacity = '0');
+                document.getElementById('bouquet-svg').style.opacity = '0';
+                document.getElementById('sparkles-container').style.opacity = '0';
+                document.getElementById('the-envelope-container').style.opacity = '0';
                 
                 const finalModal = document.getElementById('final-letter-modal');
                 finalModal.classList.remove('hidden');
