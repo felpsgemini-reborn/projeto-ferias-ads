@@ -13,15 +13,18 @@
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         
+        /* Fontes e Quiz */
         .supernatural-title { font-family: 'Cinzel', serif; letter-spacing: 0.3em; text-shadow: 0 0 15px rgba(185, 28, 28, 0.6), 0 0 5px rgba(185, 28, 28, 0.8); }
         .romantic-text { font-family: 'Dancing Script', cursive; }
         
         .symbol-fade-in { animation: fadeInSymbol 1s ease-in-out forwards; }
         @keyframes fadeInSymbol { from { opacity: 0; transform: scale(0.9); } to { opacity: 0.12; transform: scale(1); } }
 
+        /* Cortinas com Z-Index super alto */
         .curtain-panel { transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; background: repeating-linear-gradient(90deg, #7f1d1d 0%, #450a0a 5%, #7f1d1d 10%); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 9999; }
         .curtain-closed .curtain-panel { width: 50%; }
         
+        /* Holofotes */
         #spotlights-container { opacity: 0; transition: opacity 0.5s ease; z-index: 10000; }
         .spotlights-active { opacity: 1 !important; }
         .spotlight-circle { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%); mix-blend-mode: overlay; filter: blur(4px); pointer-events: none; }
@@ -30,10 +33,12 @@
         @keyframes roam2 { 0% { top: 80%; left: 80%; transform: scale(1.1); } 50% { top: 20%; left: 50%; transform: scale(0.8); } 100% { top: 70%; left: 10%; transform: scale(1.3); } }
         @keyframes roam3 { 0% { top: 50%; left: 20%; transform: scale(0.9); } 50% { top: 80%; left: 70%; transform: scale(1.4); } 100% { top: 30%; left: 40%; transform: scale(1); } }
 
+        /* Toasts */
         .toast-enter { animation: slideInRight 0.4s forwards; } .toast-leave { animation: fadeOutRight 0.5s forwards; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
+        /* === REVELAÇÃO E CORDA === */
         #revelation-container { position: fixed; inset: 0; background-color: #000; z-index: 50; overflow: hidden; display: none; }
         .show-revelation { display: flex !important; flex-direction: column; align-items: center; justify-content: center;}
 
@@ -42,6 +47,7 @@
         .cord-ring { width: 40px; height: 40px; border: 4px solid #52525b; border-radius: 50%; background: #18181b; display: flex; align-items: center; justify-content: center; margin-top: -5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
         .cord-pulled { transform: translate(-50%, -150%); }
 
+        /* === ENVELOPE === */
         .envelope-outer { position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 110; transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; }
         .envelope-outer.magic-active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 
@@ -63,6 +69,9 @@
 
         #final-letter-modal { transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 120; max-height: 90vh; overflow-y: auto; }
 
+        /* =======================================================
+           CÓDIGO DAS FLORES AMARILLAS (ISOLADO NO #flower-stage)
+           ======================================================= */
         #flower-stage { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; background-color: #000; overflow: hidden; perspective: 1000px; z-index: 10; opacity: 0; transition: opacity 2s ease-in-out; }
         #flower-stage .night { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 100%; height: 100%; filter: blur(0.1vmin); background-image: radial-gradient(ellipse at top, transparent 0%, #000), radial-gradient(ellipse at bottom, #000, rgba(145, 233, 255, 0.2)), repeating-linear-gradient(220deg, black 0px, black 19px, transparent 19px, transparent 22px), repeating-linear-gradient(189deg, black 0px, black 19px, transparent 19px, transparent 22px), repeating-linear-gradient(148deg, black 0px, black 19px, transparent 19px, transparent 22px), linear-gradient(90deg, #00fffa, #f0f0f0); z-index: 1; }
         #flower-stage .flowers { position: relative; transform: scale(0.6); z-index: 5; }
@@ -264,7 +273,6 @@
         <div id="pull-cord" class="pull-cord-wrapper" onclick="triggerMagic()">
             <div class="cord-line"></div>
             <div class="cord-ring"><div class="w-4 h-4 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div></div>
-            <!-- Atualizado para 'Toque' -->
             <span class="text-zinc-400 text-xs mt-3 font-mono uppercase tracking-widest bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-800 animate-bounce">Toque</span>
         </div>
 
@@ -382,26 +390,82 @@
             </div>
         </div>
 
-        <!-- CARTA FINAL GIGANTE COM ESPAÇO PARA A ARTE ASCII -->
-        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-zinc-950/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.3)] p-6 sm:p-10 flex flex-col items-center justify-start opacity-0 scale-50 pointer-events-none border-2 border-rose-500/50">
-            <h1 class="romantic-text text-4xl sm:text-5xl text-rose-500 mb-6 text-center drop-shadow-[0_0_10px_rgba(225,29,72,0.8)] mt-4">Surpresa...</h1>
+        <!-- CARTA FINAL GIGANTE COM TEXTO E ARTE ASCII -->
+        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-zinc-950/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.3)] p-4 sm:p-10 flex flex-col items-center justify-start opacity-0 scale-50 pointer-events-none border-2 border-rose-500/50 overflow-y-auto max-h-[90vh] pb-8">
+            <h1 class="romantic-text text-3xl sm:text-5xl text-rose-500 mb-4 text-center drop-shadow-[0_0_10px_rgba(225,29,72,0.8)] mt-2">Surpresa...</h1>
             
-            <p class="text-rose-50 text-sm sm:text-base leading-relaxed text-center mb-4">
-                A verdade é que esse site nunca foi um trabalho de férias. Eu criei tudo isso do zero só para ter a desculpa perfeita para falar com você de um jeito especial.
+            <p class="text-rose-50 text-[13px] sm:text-base leading-relaxed text-center mb-3">
+                Oiii, então como que você está? Espero que esteja bem. Então pra começar não tinha projeto da Fatec, era mais pra um projeto particular kkkk, com principal motivo de falar um coisa importante, já que eu tenho bastante vergonha sobre essas coisas, então decide apostar tudo num esforço pessoal em que sou bom de fazer.
             </p>
-            <p id="seu-texto-aqui" class="text-rose-50 text-sm sm:text-base leading-relaxed text-center font-medium">
-                (Aqui entra a sua grande declaração abrindo o coração pra ela!)
+            <p class="text-rose-50 text-[13px] sm:text-base leading-relaxed text-center mb-3">
+                Queria falar que desde que a gente voltou a conversar eu tenho amado muito passar o tempo conversando com você desde assuntos do dia a dia até sobre as séries, que é uma parte muito boa kkkk, mas tem uma coisa que não consigo tirar da cabeça que sempre lembro de manhã e quando vou dormir. Que seria você....
+            </p>
+            <p class="text-rose-50 text-[13px] sm:text-base leading-relaxed text-center mb-4">
+                Posso não ser Dean, nem Sam ou até mesmo Castiel, mas eu rezaria todo santo dia só para poder ver esse anjo com que adoro conversar e passar o tempo, e que eu gosto muito mesmo.
+            </p>
+            <p class="text-rose-50 text-[13px] sm:text-base leading-relaxed text-center mb-6 font-medium">
+                Então gostaria de perguntar apenas eu única coisa para você que gostaria que me falasse:
             </p>
             
-            <!-- CONTÊINER PREPARADO PARA A ARTE ASCII -->
-            <pre id="ascii-art-container" class="text-[5px] sm:text-[7px] font-mono leading-none text-rose-500 mt-6 mb-8 text-center overflow-x-hidden w-full flex justify-center opacity-80">
-                <!-- A arte ASCII vai entrar aqui -->
-            </pre>
-            
-            <div class="flex gap-4 mt-auto mb-4">
-                <button class="px-6 py-3 bg-rose-600 text-white rounded-full font-bold shadow-[0_0_15px_rgba(225,29,72,0.6)] hover:bg-rose-500 active:scale-95 transition-all">Eu Amei!</button>
+            <!-- PERGUNTA DESTAQUE (Falso Botão) -->
+            <div class="flex gap-4 mb-4">
+                <span class="px-6 py-3 bg-rose-600 text-white rounded-full font-bold shadow-[0_0_15px_rgba(225,29,72,0.6)] block my-4 text-center">Eu tenho chance?</span>
             </div>
             
+            <!-- ARTE ASCII -->
+            <pre class="font-mono text-[4px] min-[375px]:text-[4.5px] min-[414px]:text-[5px] sm:text-[7px] leading-[1.1] text-rose-400 text-center flex justify-center opacity-80 mt-2">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⢠⠿⠷⣭⣶⣯⣥⣶⣾⣿⠀⠀⠀⠀⢠⠖⣒⡒⢢⣄⡴⠒⢢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢸⠷⣾⣿⡀⢠⡿⠑⠀⠀⢸⣿⡿⡄⠀⠀⠀⢸⢼⣍⠙⠛⠙⢷⡀⠀⣷⠒⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢸⣼⡟⣭⣻⢿⣧⡀⠀⣰⡿⠛⣫⣽⠀⠀⢠⠃⠈⢾⣄⠀⠀⢸⣷⡶⠓⢷⣄⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⡏⠀⠈⠀⠙⣿⣴⡿⠁⠀⠁⢸⠂⠀⢸⠀⠀⠀⢫⣆⣰⡟⠁⠀⠀⢈⣿⠃⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠀⠀⠀⠀⠘⣿⡇⠀⠀⢀⡟⠀⠀⠘⡆⠀⠀⠀⣿⡏⠀⠀⠀⠀⣸⡏⠀⠀⣾⣿⣿⣿⣶⣾⡝⡆⣀⡀
+⠀⠀⠀⠀⠀⢀⡠⣤⠤⡀⠈⢧⡀⠀⠀⠀⣻⡇⠀⣠⠞⠀⠀⠀⠀⠙⢄⡀⠀⣿⠁⠀⠀⠀⣰⠋⠀⠀⡰⣿⢿⣏⠀⠹⣷⣿⣿⣿⣿
+⠀⠀⡞⠉⢱⡾⠾⠛⣷⠷⡀⠀⠙⠦⠤⢤⣿⣿⠟⠀⠀⠀⠀⠀⢀⣴⣀⠭⢶⣿⣤⣄⠤⠞⠁⠀⠀⠀⣿⣿⠎⢿⣦⣾⠟⠏⠾⣿⡇
+⡖⢒⣇⡀⣿⠀⠀⢠⡟⠀⠘⡆⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⣠⣿⣿⡇⠀⢰⡏⠀⠈⠑⠢⣄⡀⠀⠀⢻⡹⠀⢸⡿⠁⠀⠂⣰⡟⠀
+⠱⣼⠋⠉⠛⠷⣤⣼⠁⠀⠀⢱⠀⠀⠀⠀⠀⢹⡇⠀⠀⡠⢺⣿⣿⣿⡇⠀⣼⠇⠀⠀⠀⠀⠀⣭⠲⢄⡀⠙⢦⣼⣧⠄⢀⡴⠋⠀⠀
+⠀⠻⣆⠀⠀⠀⠈⢻⡄⠀⢀⠆⠀⠀⠀⣰⡄⠘⣷⢀⡜⠁⣾⣿⣿⣿⡇⢀⡿⠀⠀⠀⣴⣧⢸⣿⣧⠀⠉⠲⢄⣿⠋⠉⠉⠀⠀⠀⠀
+⠀⠀⠙⢦⡀⠀⠀⠀⣧⣴⠋⠀⠀⠀⢠⣿⣿⡄⢿⡎⠀⢸⣿⣿⣿⣿⡇⢸⡇⠀⢀⣾⣿⣿⣾⣿⣿⡇⠀⠀⢸⠏⠑⠢⣀⣤⡶⠀⠀
+⠀⠀⠀⠀⠈⠁⠒⠈⠙⣯⠀⠀⠀⠀⣼⣿⣿⣿⣼⡇⠀⣿⣿⣿⣿⣿⠃⣾⠃⢀⣿⣿⣿⡇⣿⣿⣿⣧⠀⢀⡿⠀⢀⣴⣿⣿⡇⠀⠀
+⠀⠀⠀⢀⣀⠀⠀⠀⠀⠘⣷⠀⠀⠀⣿⣿⣿⣿⣟⡇⢠⣿⣿⣿⣿⡟⢀⣿⢀⣾⣿⣿⣿⠇⢿⣿⣿⣿⠀⣸⠇⢠⣾⣿⣿⠏⢣⠀⠀
+⠀⠀⠀⠈⢿⣿⣦⣄⠀⠀⠘⣧⠀⢀⣿⣿⣿⣿⣿⣿⢸⣿⣿⣿⡿⠁⢸⡏⣸⣿⣿⣿⡟⠀⠸⣿⣿⣿⢀⡿⢠⣿⣿⣿⠏⠀⠀⡇⠀
+⠀⠀⠀⠀⠈⢿⣿⣿⣷⣄⠀⣸⣷⠉⣿⣿⣿⣿⣿⢹⣸⣿⣿⡿⠁⠀⢸⣇⣿⣿⣿⡟⠀⠀⠀⠹⣿⣿⣼⢧⣿⣿⠟⠁⢀⢔⡫⠆⠀
+⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣄⠹⡆⢹⣿⣿⣿⡟⢸⣿⡿⠋⡀⠀⠀⣿⢹⣿⣿⠏⢀⣴⣿⠀⠀⠙⢿⣿⠛⠋⢁⡠⣺⠔⠉⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⣠⠟⢿⣿⣿⣿⣧⣹⡜⣿⣿⣿⠇⢸⣧⠀⢰⣿⡀⠀⣿⠸⠟⠁⠀⣾⣿⡟⠀⠀⠀⢸⣇⡠⢖⡭⠊⠀⠀⠀⠀⡄⠀
+⠀⠀⠀⠀⠀⠀⢾⠭⢒⡿⠿⢿⣿⣿⣿⣿⣿⠏⠀⠸⣿⠀⣿⣿⣷⢰⣿⠀⠀⠀⣼⣿⣿⠇⠀⢀⡤⣞⠭⠚⢹⠀⠀⠀⠀⠀⠀⠇⠀
+⠀⠀⠀⠀⠀⠀⢸⡀⠀⠘⡏⠒⠪⠭⣛⡿⠯⣀⡀⠀⣿⠀⣿⣿⣿⣸⡿⠀⠀⢰⣿⣿⣿⠴⣪⠕⠊⠁⠀⠀⠚⠀⠀⠀⠀⠀⢀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢳⠀⠀⠀⠀⠉⠑⢲⡪⠭⣛⡓⠿⢿⣿⣿⣇⠀⣀⠼⢛⡩⠒⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠈⣧⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠉⢁⡐⠖⠈⠩⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⡆⠀⠀⠘⣆⠀⠀⢀⡀⠠⠼⠓⠂⠩⠑⠒⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣀⡙⠂⠀⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠀⠀⠀⠀⠀⡇⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⢸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⡀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠃⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⡀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⠀⠘⣳⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡇⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢇⠀⠀⢹⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⠀⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠆⠀⠀⢷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠁⠀⠀⡰⠁⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡄⠀⠘⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⡰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⠀⠹⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡏⠀⠀⡰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⡄⠀⢱⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡿⠀⠀⡰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢆⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢾⠃⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢦⠈⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣨⠏⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡶⠋⠉⠓⢦⣄⢣⡈⢧⠀⠀⠀⠀⠀⠀⠀⠀⢰⡛⠀⣰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣦⣄⡀⠀⠙⢷⣷⠀⢧⠀⠀⠀⠀⠀⠀⢀⣣⡵⡾⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠷⣦⣤⣹⣟⣈⣇⣀⡠⠤⠖⠛⠉⣁⣰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠖⠋⣉⣽⠿⢻⣿⣧⣤⣤⡶⠶⠛⠋⠁⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠷⠶⠛⠉⠁⢀⣿⡞⣧⠐⠀⠀⠀⢸⢸⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣜⡟⡇⢻⡆⠀⠀⠀⠀⠏⡄⠀⠘⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⠃⡇⠀⣿⠀⣀⠀⠀⠸⠃⠀⠀⢧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠏⠀⠃⠀⢸⡇⢸⠀⠀⠀⢀⠀⠀⠸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡾⠛⠦⣀⣀⠀⠀⡇⠈⡇⠀⠀⠈⡀⠀⢀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠚⠋⠀⠀⠀⠈⢸⠀⠀⢹⠀⢣⢀⡀⠤⠒⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠁⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            </pre>
+
+            <!-- Detalhes românticos flutuantes -->
             <div class="absolute top-4 left-4 text-rose-500 animate-pulse text-xl">❤️</div>
             <div class="absolute bottom-4 right-4 text-rose-500 animate-pulse text-xl">❤️</div>
         </div>
@@ -447,7 +511,6 @@
         const bgMusic = document.getElementById('bg-music');
         const dbgtMusic = document.getElementById('dbgt-music');
 
-        // VISIBILITY API: Pausa a música se sair do navegador
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 bgMusic.pause();
@@ -514,7 +577,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('curtain-wrapper').classList.add('curtain-closed');
             
-            // FADE OUT da música de suspense ao fechar a cortina
             if(musicStarted) {
                 let fadeOut = setInterval(() => {
                     if (bgMusic.volume > 0.05) bgMusic.volume -= 0.05;
@@ -541,7 +603,6 @@
             document.getElementById('pull-cord').classList.add('cord-pulled');
             document.getElementById('flower-stage').classList.remove('not-loaded');
             
-            // INICIA A MÚSICA DO DRAGON BALL GT
             dbgtMusicStarted = true;
             dbgtMusic.volume = 0;
             dbgtMusic.play().then(() => {
