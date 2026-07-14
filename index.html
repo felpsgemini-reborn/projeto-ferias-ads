@@ -13,18 +13,15 @@
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         
-        /* Fontes e Quiz */
         .supernatural-title { font-family: 'Cinzel', serif; letter-spacing: 0.3em; text-shadow: 0 0 15px rgba(185, 28, 28, 0.6), 0 0 5px rgba(185, 28, 28, 0.8); }
         .romantic-text { font-family: 'Dancing Script', cursive; }
         
         .symbol-fade-in { animation: fadeInSymbol 1s ease-in-out forwards; }
         @keyframes fadeInSymbol { from { opacity: 0; transform: scale(0.9); } to { opacity: 0.12; transform: scale(1); } }
 
-        /* Cortinas com Z-Index super alto para não sumirem */
         .curtain-panel { transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; background: repeating-linear-gradient(90deg, #7f1d1d 0%, #450a0a 5%, #7f1d1d 10%); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 9999; }
         .curtain-closed .curtain-panel { width: 50%; }
         
-        /* Holofotes */
         #spotlights-container { opacity: 0; transition: opacity 0.5s ease; z-index: 10000; }
         .spotlights-active { opacity: 1 !important; }
         .spotlight-circle { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%); mix-blend-mode: overlay; filter: blur(4px); pointer-events: none; }
@@ -33,12 +30,10 @@
         @keyframes roam2 { 0% { top: 80%; left: 80%; transform: scale(1.1); } 50% { top: 20%; left: 50%; transform: scale(0.8); } 100% { top: 70%; left: 10%; transform: scale(1.3); } }
         @keyframes roam3 { 0% { top: 50%; left: 20%; transform: scale(0.9); } 50% { top: 80%; left: 70%; transform: scale(1.4); } 100% { top: 30%; left: 40%; transform: scale(1); } }
 
-        /* Toasts */
         .toast-enter { animation: slideInRight 0.4s forwards; } .toast-leave { animation: fadeOutRight 0.5s forwards; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
-        /* === REVELAÇÃO E CORDA === */
         #revelation-container { position: fixed; inset: 0; background-color: #000; z-index: 50; overflow: hidden; display: none; }
         .show-revelation { display: flex !important; flex-direction: column; align-items: center; justify-content: center;}
 
@@ -47,24 +42,8 @@
         .cord-ring { width: 40px; height: 40px; border: 4px solid #52525b; border-radius: 50%; background: #18181b; display: flex; align-items: center; justify-content: center; margin-top: -5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
         .cord-pulled { transform: translate(-50%, -150%); }
 
-        /* === ENVELOPE (Corrigido e posicionado no "céu" roxo/escuro) === */
-        .envelope-outer { 
-            position: absolute; 
-            top: 25%; /* Posição na parte superior da tela */
-            left: 50%; 
-            transform: translate(-50%, -50%) scale(0); 
-            opacity: 0; 
-            z-index: 110; 
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-        }
-        /* Corrigido o seletor aqui! */
-        .envelope-outer.magic-active { 
-            transform: translate(-50%, -50%) scale(1); 
-            opacity: 1; 
-        }
+        .envelope-outer { position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 110; transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; }
+        .envelope-outer.magic-active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 
         .envelope-wrapper { width: 140px; height: 90px; position: relative; perspective: 800px; cursor: pointer; animation: floatEnvelope 3s infinite ease-in-out; }
         @keyframes floatEnvelope { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -82,43 +61,11 @@
         .envelope-open .env-letter { transform: translateY(-45px); }
         .envelope-open .env-letter p { opacity: 1; }
 
-        #final-letter-modal { transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 120; }
+        #final-letter-modal { transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 120; max-height: 90vh; overflow-y: auto; }
 
-        /* =======================================================
-           CÓDIGO DAS FLORES (ISOLADO NO #flower-stage)
-           ======================================================= */
-        #flower-stage {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            background-color: #000;
-            overflow: hidden;
-            perspective: 1000px;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-        }
-
-        #flower-stage .night {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            transform: translateX(-50%);
-            width: 100%;
-            height: 100%;
-            filter: blur(0.1vmin);
-            background-image: radial-gradient(ellipse at top, transparent 0%, #000), radial-gradient(ellipse at bottom, #000, rgba(145, 233, 255, 0.2)), repeating-linear-gradient(220deg, black 0px, black 19px, transparent 19px, transparent 22px), repeating-linear-gradient(189deg, black 0px, black 19px, transparent 19px, transparent 22px), repeating-linear-gradient(148deg, black 0px, black 19px, transparent 19px, transparent 22px), linear-gradient(90deg, #00fffa, #f0f0f0);
-            z-index: 1;
-        }
-
-        #flower-stage .flowers {
-            position: relative;
-            transform: scale(0.6); 
-            z-index: 5;
-        }
-
+        #flower-stage { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; background-color: #000; overflow: hidden; perspective: 1000px; z-index: 10; opacity: 0; transition: opacity 2s ease-in-out; }
+        #flower-stage .night { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 100%; height: 100%; filter: blur(0.1vmin); background-image: radial-gradient(ellipse at top, transparent 0%, #000), radial-gradient(ellipse at bottom, #000, rgba(145, 233, 255, 0.2)), repeating-linear-gradient(220deg, black 0px, black 19px, transparent 19px, transparent 22px), repeating-linear-gradient(189deg, black 0px, black 19px, transparent 19px, transparent 22px), repeating-linear-gradient(148deg, black 0px, black 19px, transparent 19px, transparent 22px), linear-gradient(90deg, #00fffa, #f0f0f0); z-index: 1; }
+        #flower-stage .flowers { position: relative; transform: scale(0.6); z-index: 5; }
         #flower-stage .flower { position: absolute; bottom: 10vmin; transform-origin: bottom center; z-index: 10; --fl-speed: 0.8s; }
         #flower-stage .flower--1 { animation: moving-flower-1 4s linear infinite; }
         #flower-stage .flower--1 .flower__line { height: 70vmin; animation-delay: 0.3s; }
@@ -182,7 +129,7 @@
         #flower-stage .flower__g-long__top { top: calc(var(--h) * -1); width: calc(var(--w) + 1vmin); height: var(--h); border-top-right-radius: 100%; border-right: 0.7vmin solid var(--c); transform: translate(-0.7vmin, 1vmin); }
         #flower-stage .flower__g-long__bottom { width: var(--w); height: 50vmin; transform-origin: bottom center; background-image: linear-gradient(to top, transparent 30%, var(--c)); box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); clip-path: polygon(35% 0, 65% 1%, 100% 100%, 0% 100%); }
         #flower-stage .flower__g-right { position: absolute; bottom: 6vmin; left: -2vmin; transform-origin: bottom left; transform: rotate(20deg); }
-        #flower-stage .flower__g-right .leaf { width: 30vmin; height: 50vmin; border-top-left-radius: 100%; border-left: 2vmin solid #079097; background-image: linear-gradient(to bottom, transparent, #000 60%); -webkit-mask-image: linear-gradient(to top, transparent 30%, #079097 60%); mask-image: linear-gradient(to top, transparent 30%, #079097 60%); }
+        #flower-stage .flower__g-right .leaf { width: 30vmin; height: 50vmin; border-top-left-radius: 100%; border-left: 2vmin solid #079097; -webkit-mask-image: linear-gradient(to top, transparent 25%, #079097 50%); mask-image: linear-gradient(to top, transparent 25%, #079097 50%); position: relative; z-index: 1; }
         #flower-stage .flower__g-right--1 { animation: flower-g-right-ans 2.5s linear infinite; }
         #flower-stage .flower__g-right--2 { left: 5vmin; transform: rotateY(-180deg); animation: flower-g-right-ans--2 3s linear infinite; }
         #flower-stage .flower__g-right--2 .leaf { height: 75vmin; filter: blur(0.3vmin); opacity: 0.8; }
@@ -262,15 +209,19 @@
         @keyframes growing-grass-ans { 0% { transform: scale(0); } }
         
         #flower-stage.not-loaded * { animation-play-state: paused !important; }
-
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 font-sans selection:bg-red-900 selection:text-white">
 
+    <!-- Áudios separados para transição perfeita -->
     <audio id="bg-music" loop>
         <source src="musica.mp3" type="audio/mpeg">
     </audio>
+    <audio id="dbgt-music" loop>
+        <source src="dbgt.mp3" type="audio/mpeg">
+    </audio>
 
+    <!-- O DISFARCE (QUIZ) -->
     <div id="quiz-container" class="flex flex-col min-h-screen w-full relative pb-10 transition-opacity duration-1000">
         <header class="w-full p-4 border-b border-zinc-900 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-20 flex flex-col items-center justify-center">
             <span class="text-[9px] text-zinc-600 uppercase tracking-[0.2em] font-bold">FATEC - Análise e Desenvolvimento de Sistemas</span>
@@ -295,6 +246,7 @@
         </main>
     </div>
 
+    <!-- CORTINAS TEATRAIS -->
     <div id="curtain-wrapper" class="fixed inset-0 z-[9999] pointer-events-none flex overflow-hidden">
         <div id="curtain-left" class="curtain-panel h-full border-r-4 border-red-950/80"></div>
         <div id="curtain-right" class="curtain-panel h-full border-l-4 border-red-950/80 ml-auto"></div>
@@ -305,14 +257,18 @@
         </div>
     </div>
 
+    <!-- TELA DE REVELAÇÃO -->
     <div id="revelation-container">
         
+        <!-- CORDA -->
         <div id="pull-cord" class="pull-cord-wrapper" onclick="triggerMagic()">
             <div class="cord-line"></div>
             <div class="cord-ring"><div class="w-4 h-4 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div></div>
-            <span class="text-zinc-400 text-xs mt-3 font-mono uppercase tracking-widest bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-800 animate-bounce">Puxe</span>
+            <!-- Atualizado para 'Toque' -->
+            <span class="text-zinc-400 text-xs mt-3 font-mono uppercase tracking-widest bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-800 animate-bounce">Toque</span>
         </div>
 
+        <!-- O PALCO DAS FLORES -->
         <div id="flower-stage" class="not-loaded">
             <div class="night"></div>
             <div class="flowers">
@@ -413,6 +369,7 @@
             </div>
         </div>
 
+        <!-- ENVELOPE (NO CÉU) -->
         <div class="envelope-outer" id="the-envelope-container">
             <span class="text-white font-bold mb-3 animate-bounce bg-rose-600 px-4 py-1 rounded-full text-xs shadow-[0_0_15px_rgba(225,29,72,0.8)] border border-rose-400">Aperte</span>
             <div class="envelope-wrapper" onclick="openEnvelope(this)">
@@ -425,29 +382,36 @@
             </div>
         </div>
 
-        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-zinc-950/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.3)] p-8 sm:p-10 flex flex-col items-center justify-center opacity-0 scale-50 pointer-events-none border-2 border-rose-500/50">
-            <h1 class="romantic-text text-4xl sm:text-5xl text-rose-500 mb-6 text-center drop-shadow-[0_0_10px_rgba(225,29,72,0.8)]">Surpresa...</h1>
-            <p class="text-rose-50 text-base sm:text-lg leading-relaxed text-center mb-4">
+        <!-- CARTA FINAL GIGANTE COM ESPAÇO PARA A ARTE ASCII -->
+        <div id="final-letter-modal" class="absolute inset-4 sm:inset-10 bg-zinc-950/95 backdrop-blur-md rounded-2xl shadow-[0_0_50px_rgba(225,29,72,0.3)] p-6 sm:p-10 flex flex-col items-center justify-start opacity-0 scale-50 pointer-events-none border-2 border-rose-500/50">
+            <h1 class="romantic-text text-4xl sm:text-5xl text-rose-500 mb-6 text-center drop-shadow-[0_0_10px_rgba(225,29,72,0.8)] mt-4">Surpresa...</h1>
+            
+            <p class="text-rose-50 text-sm sm:text-base leading-relaxed text-center mb-4">
                 A verdade é que esse site nunca foi um trabalho de férias. Eu criei tudo isso do zero só para ter a desculpa perfeita para falar com você de um jeito especial.
             </p>
-            <p class="text-rose-50 text-base sm:text-lg leading-relaxed text-center mb-6 font-medium">
+            <p id="seu-texto-aqui" class="text-rose-50 text-sm sm:text-base leading-relaxed text-center font-medium">
                 (Aqui entra a sua grande declaração abrindo o coração pra ela!)
             </p>
             
-            <div class="flex gap-4 mt-auto">
+            <!-- CONTÊINER PREPARADO PARA A ARTE ASCII -->
+            <pre id="ascii-art-container" class="text-[5px] sm:text-[7px] font-mono leading-none text-rose-500 mt-6 mb-8 text-center overflow-x-hidden w-full flex justify-center opacity-80">
+                <!-- A arte ASCII vai entrar aqui -->
+            </pre>
+            
+            <div class="flex gap-4 mt-auto mb-4">
                 <button class="px-6 py-3 bg-rose-600 text-white rounded-full font-bold shadow-[0_0_15px_rgba(225,29,72,0.6)] hover:bg-rose-500 active:scale-95 transition-all">Eu Amei!</button>
             </div>
             
-            <div class="absolute top-4 left-4 text-rose-500 animate-pulse text-2xl">❤️</div>
-            <div class="absolute bottom-4 right-4 text-rose-500 animate-pulse text-2xl">❤️</div>
+            <div class="absolute top-4 left-4 text-rose-500 animate-pulse text-xl">❤️</div>
+            <div class="absolute bottom-4 right-4 text-rose-500 animate-pulse text-xl">❤️</div>
         </div>
 
     </div>
 
+    <!-- TOASTS -->
     <div id="toast-container" class="fixed top-20 right-4 z-[200] flex flex-col gap-3 max-w-[90vw]"></div>
 
     <script>
-        // --- QUIZ LOGIC MANTIDA ---
         const questions = [
             { question: "Qual lenda urbana foi o primeiro espírito enfrentado pelos irmãos Winchester?", options: ["O Homem Gancho", "Bloody Mary", "A Mulher de Branco", "Wendigo"], correctAnswer: 2, symbol: "pentagram" },
             { question: "Qual era o principal objetivo do Demônio dos Olhos Amarelos (Azazel)?", options: ["Matar John", "Abrir o Portão do Inferno", "Encontrar o Colt", "Destruir Homens das Letras"], correctAnswer: 1, symbol: "demon_trap" },
@@ -477,8 +441,22 @@
             tulpa: `<svg class="w-24 h-24 symbol-fade-in drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" /></svg>`
         };
 
-        let currentQuestionIndex = 0; let isTransitioning = false; let musicStarted = false;
+        let currentQuestionIndex = 0; let isTransitioning = false; 
+        let musicStarted = false; let dbgtMusicStarted = false;
+        
         const bgMusic = document.getElementById('bg-music');
+        const dbgtMusic = document.getElementById('dbgt-music');
+
+        // VISIBILITY API: Pausa a música se sair do navegador
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                bgMusic.pause();
+                dbgtMusic.pause();
+            } else {
+                if (musicStarted && !dbgtMusicStarted) bgMusic.play().catch(()=>{});
+                if (dbgtMusicStarted) dbgtMusic.play().catch(()=>{});
+            }
+        });
 
         function startMusicFadeIn() {
             if (musicStarted) return;
@@ -535,7 +513,14 @@
         function startTheatricalReveal() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('curtain-wrapper').classList.add('curtain-closed');
-            if(musicStarted) bgMusic.volume = 0.1;
+            
+            // FADE OUT da música de suspense ao fechar a cortina
+            if(musicStarted) {
+                let fadeOut = setInterval(() => {
+                    if (bgMusic.volume > 0.05) bgMusic.volume -= 0.05;
+                    else { bgMusic.pause(); clearInterval(fadeOut); }
+                }, 100);
+            }
             
             setTimeout(() => {
                 document.getElementById('quiz-container').style.display = 'none';
@@ -546,7 +531,6 @@
                     document.getElementById('spotlights-container').classList.remove('spotlights-active');
                     setTimeout(() => {
                         document.getElementById('curtain-wrapper').classList.remove('curtain-closed');
-                        // Exibe o palco das flores (mas continua pausado por causa da classe not-loaded)
                         document.getElementById('flower-stage').style.opacity = '1';
                     }, 800); 
                 }, 4000); 
@@ -555,13 +539,19 @@
 
         function triggerMagic() {
             document.getElementById('pull-cord').classList.add('cord-pulled');
-            
-            // Ativa o código original das flores tirando o freio (not-loaded)
             document.getElementById('flower-stage').classList.remove('not-loaded');
             
-            if(musicStarted) bgMusic.volume = 0.5;
+            // INICIA A MÚSICA DO DRAGON BALL GT
+            dbgtMusicStarted = true;
+            dbgtMusic.volume = 0;
+            dbgtMusic.play().then(() => {
+                let vol = 0;
+                let fadeIn = setInterval(() => {
+                    if (vol < 0.5) { vol += 0.05; dbgtMusic.volume = vol; }
+                    else clearInterval(fadeIn);
+                }, 200);
+            }).catch(e => console.log("Autoplay DBGT retido."));
 
-            // Mostra a carta
             setTimeout(() => {
                 document.getElementById('the-envelope-container').classList.add('magic-active');
             }, 4500); 
